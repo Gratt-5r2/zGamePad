@@ -44,9 +44,9 @@ namespace GOTHIC_ENGINE {
   }
 
   void Game_Init() {
-    //zoptions->WriteBool( "GAME", "usePotionKeys",      True, True );
-    //zoptions->WriteBool( "GAME", "useGothic1Controls", True, True );
-    //XInputDevice.InitDevice();
+    // zoptions->WriteBool( "GAME", "usePotionKeys",      True, True );
+    // zoptions->WriteBool( "GAME", "useGothic1Controls", True, True );
+    // XInputDevice.InitDevice();
   }
 
   void Game_Exit() {

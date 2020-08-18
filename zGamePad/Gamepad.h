@@ -101,7 +101,7 @@ namespace GOTHIC_ENGINE {
     void UpdateRightSticksState();
     void UpdateSticksState();
     void UpdateKeyState();
-    bool SkipVideo();
+    bool ForceVideoSkipping();
     bool ParseControlFile();
     void ParseControlsCombination( zTCombination& combination, string row );
     void ParseControlsEmulation( zTCombination& combination, string row );

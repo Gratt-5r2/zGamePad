@@ -344,3 +344,4 @@ healthchecksdb
 *.lastbuildstate
 *.idb
 /zGamePad/G2A Debug
+/zGamePad/MP Release

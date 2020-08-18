@@ -221,8 +221,8 @@ namespace GOTHIC_ENGINE {
         return;
       }
 
-      Vibration.wLeftMotorSpeed  = strength.ToInt32();      // Hight-motor
-      Vibration.wRightMotorSpeed = 0;// strength.ToInt32(); // Low-motor
+      Vibration.wLeftMotorSpeed  = strength.ToInt32(); // Low-speed motor
+      Vibration.wRightMotorSpeed = 0;                  // Hight-speed motor
       XInputSetState( 0, &Vibration );
     }
   }
@@ -311,25 +311,25 @@ namespace GOTHIC_ENGINE {
 
 
 
-  bool zCXInputDevice::SkipVideo() {
-    if( ActiveVideo ) {
-      static CTimer timer;
-      timer.Attach();
+  bool zCXInputDevice::ForceVideoSkipping() {
+    static bool skipReady = false;
 
-      if( KeyStates != 0 ) {
-        if( timer( 0, tickonce, TM_PRIMARY ) ) {
-          keybd_event( VK_ESCAPE, 0, 0, 0 );
-          Sleep( 50 );
-          keybd_event( VK_ESCAPE, 0, KEYEVENTF_KEYUP, 0 );
-        }
-      }
-      else
-        timer.Delete( 0 );
+    if( !ActiveVideo ) {
+      if( skipReady )
+        skipReady = false;
 
-      return true;
+      return false;
     }
 
-    return false;
+    if( !KeyStates )
+      skipReady = true;
+
+    if( KeyStates && skipReady ) {
+      SetKeyStateAndInsert( KEY_ESCAPE, True );
+      skipReady = false;
+    }
+
+    return true;
   }
 
 
@@ -339,8 +339,8 @@ namespace GOTHIC_ENGINE {
     KeyStates = Gamepad.Gamepad.wButtons;
     UpdateSticksState();
 
-    if( SkipVideo() )
-      return;
+    if( ForceVideoSkipping() )
+     return;
 
     for( uint i = 0; i < KeyCombinations.GetNum(); i++ )
       KeyCombinations[i].CheckDisable( KeyStates );
@@ -348,17 +348,15 @@ namespace GOTHIC_ENGINE {
     if( KeyStates ) {
       for( uint i = 0; i < KeyCombinations.GetNum(); i++ )
         if( KeyCombinations[i].CheckEnable( KeyStates ) )
-          /*break*/continue;
+          /*break*/ continue;
     }
   }
 
 
 
   void zCXInputDevice::UpdateGamePad() {
-    //if( player && player->human_ai ) {
-      UpdateKeyState();
-      UpdateVibration();
-    //}
+    UpdateKeyState();
+    UpdateVibration();
   }
 
 
