@@ -104,9 +104,9 @@ namespace GOTHIC_ENGINE {
   HOOK Hook_oCBinkPlayer_OpenVideo PATCH( &zCBinkPlayer::OpenVideo, &oCBinkPlayer_OpenVideo );
 
   int __fastcall oCBinkPlayer_OpenVideo( zCBinkPlayer* _this, void* vtable, zSTRING videoName ) {
-    ActiveVideo = true;
-    BackGroundGamepadProcess_Thread.Init( BackGroundGamepadProcess );
-    BackGroundGamepadProcess_Thread.Detach();
+    //ActiveVideo = true;
+    //BackGroundGamepadProcess_Thread.Init( BackGroundGamepadProcess );
+    //BackGroundGamepadProcess_Thread.Detach();
     return Hook_oCBinkPlayer_OpenVideo( _this, vtable, videoName );
   }
 
@@ -120,8 +120,68 @@ namespace GOTHIC_ENGINE {
   HOOK Hook_oCBinkPlayer_CloseVideo PATCH( &zCBinkPlayer::CloseVideo, &oCBinkPlayer_CloseVideo );
 
   int __fastcall oCBinkPlayer_CloseVideo( zCBinkPlayer* _this, void* vtable ) {
-    BackGroundGamepadProcess_Thread.Break();
-    ActiveVideo = false;
+    //BackGroundGamepadProcess_Thread.Break();
+    //ActiveVideo = false;
     return Hook_oCBinkPlayer_CloseVideo( _this, vtable );
+  }
+
+
+
+
+  // public: virtual int __thiscall zCBinkPlayer::PlayFrame(void)
+  int __fastcall oCBinkPlayer_PlayFrame( zCBinkPlayer*, void* );
+
+  HOOK Hook_oCBinkPlayer_PlayFrame PATCH( &zCBinkPlayer::PlayHandleEvents, &oCBinkPlayer_PlayFrame );
+
+  int __fastcall oCBinkPlayer_PlayFrame( zCBinkPlayer* _this, void* vtable ) {
+    //cmd << "frame " << rand() % 10 << endl;
+    ActiveVideo = true;
+    XInputDevice.UpdateGamePad();
+    ActiveVideo = false;
+    return Hook_oCBinkPlayer_PlayFrame( _this, vtable );
+  }
+
+
+
+
+
+
+
+  /*int InitDInput_Union( HWND hWnd, HINSTANCE hInstance );
+
+  HOOK Hook_InitDInput PATCH( &InitDInput, &InitDInput_Union );
+
+  int InitDInput_Union( HWND hWnd, HINSTANCE hInstance ) {
+    int Ok = Hook_InitDInput( hWnd, hInstance );
+    Message::Box( 123 );
+
+    if( zinput )
+      XInputDevice.InitDevice();
+
+    return Ok;
+  }*/
+
+
+
+
+
+  // 0x00509580 void __cdecl zCarsten_StartUp(struct HWND__ * *)
+  /*void zCarsten_StartUp_Union( HWND* hWnd );
+
+  HOOK Hook_zCarsten_StartUp AS( &zCarsten_StartUp, &zCarsten_StartUp_Union );
+
+  void zCarsten_StartUp_Union( HWND* hWnd ) {
+    Hook_zCarsten_StartUp( hWnd );
+    XInputDevice.InitDevice();
+  }*/
+
+
+
+  // void CGameManager::GameInit()
+  HOOK Hook_CGameManager_Init PATCH( &CGameManager::Init, &CGameManager::Init_Union );
+
+  void CGameManager::Init_Union( HWND& hWnd ) {
+    THISCALL( Hook_CGameManager_Init )( hWnd );
+    XInputDevice.InitDevice();
   }
 }

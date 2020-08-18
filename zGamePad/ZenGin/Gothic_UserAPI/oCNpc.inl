@@ -13,3 +13,7 @@ void CreateVobList_Union( float max_dist );
 void GetNearestValidVob_Union( float max_dist );
 void GetNearestVob_Union( float max_dist );
 void CollectFocusVob_Union( const int a_bForce );
+
+#if ENGINE < Engine_G2
+static int s_bTargetLocked;
+#endif

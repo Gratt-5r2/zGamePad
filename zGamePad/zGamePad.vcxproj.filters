@@ -217,6 +217,15 @@
     <Filter Include="Plugin\Workspace\Gamepad">
       <UniqueIdentifier>{2157850e-6a00-4d70-a109-cc25ebc6a59a}</UniqueIdentifier>
     </Filter>
+    <Filter Include="Plugin\Workspace\Gamepad\Controls">
+      <UniqueIdentifier>{cd0cff63-7a00-42f9-a8e9-e43bec45e235}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Plugin\Workspace\Gamepad\Controls\Parser">
+      <UniqueIdentifier>{6c0ac966-a30d-4eca-b88a-2bbcb301ee28}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Plugin\Workspace\Gamepad\Helpers">
+      <UniqueIdentifier>{02095c19-3436-4848-afdd-3d8eefdbbf9a}</UniqueIdentifier>
+    </Filter>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="Interface.cpp">
@@ -2786,14 +2795,20 @@
     <ClInclude Include="Gamepad.h">
       <Filter>Plugin\Workspace\Gamepad</Filter>
     </ClInclude>
-    <ClInclude Include="Hooks.cpp">
-      <Filter>Plugin\Workspace\Gamepad</Filter>
-    </ClInclude>
     <ClInclude Include="ControlOverrides.cpp">
-      <Filter>Plugin\Workspace\Gamepad</Filter>
+      <Filter>Plugin\Workspace\Gamepad\Controls</Filter>
+    </ClInclude>
+    <ClInclude Include="ControlParser.cpp">
+      <Filter>Plugin\Workspace\Gamepad\Controls\Parser</Filter>
+    </ClInclude>
+    <ClInclude Include="ControlParser.h">
+      <Filter>Plugin\Workspace\Gamepad\Controls\Parser</Filter>
+    </ClInclude>
+    <ClInclude Include="Hooks.cpp">
+      <Filter>Plugin\Workspace\Gamepad\Helpers</Filter>
     </ClInclude>
     <ClInclude Include="Conditions.cpp">
-      <Filter>Plugin\Workspace\Gamepad</Filter>
+      <Filter>Plugin\Workspace\Gamepad\Helpers</Filter>
     </ClInclude>
   </ItemGroup>
   <ItemGroup>

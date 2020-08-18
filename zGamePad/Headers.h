@@ -4,6 +4,7 @@
 // Automatically generated block
 #pragma region Includes
 #include "Gamepad.h"
+#include "ControlParser.h"
 #include "Plugin.h"
 #pragma endregion
 

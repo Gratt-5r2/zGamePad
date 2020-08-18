@@ -3,3 +3,4 @@
 // User API for oCGame
 // Add your methods here
 
+void Init_Union();

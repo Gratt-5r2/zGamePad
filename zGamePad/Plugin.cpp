@@ -2,6 +2,11 @@
 // File: "Sources.h"
 
 namespace GOTHIC_ENGINE {
+#if ENGINE < Engine_G2
+  int oCNpc::s_bTargetLocked = False;
+#endif
+
+
 
   void SetHeadingToEnemy( oCNpc* killer, oCNpc* enemy ) {
     zVEC3 vector3D = (enemy->GetPositionWorld() - killer->GetPositionWorld()).Normalize();
@@ -41,7 +46,7 @@ namespace GOTHIC_ENGINE {
   void Game_Init() {
     //zoptions->WriteBool( "GAME", "usePotionKeys",      True, True );
     //zoptions->WriteBool( "GAME", "useGothic1Controls", True, True );
-    XInputDevice.InitDevice();
+    //XInputDevice.InitDevice();
   }
 
   void Game_Exit() {

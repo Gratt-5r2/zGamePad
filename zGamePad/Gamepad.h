@@ -3,12 +3,14 @@
 
 namespace GOTHIC_ENGINE {
   typedef int JOYKEY, DXKEY;
+  typedef bool( *LPCONDFUNC )();
 
   struct zTCombination {
-    Array<JOYKEY> Combination;
-    Array<DXKEY>  Emulation;
-    bool          Enabled;
-    bool (*Condition)();
+    Array<JOYKEY>     Combination;
+    Array<DXKEY>      Emulation;
+    Array<bool (*)()> AllowConditions;
+    Array<bool( *)()> DenyConditions;
+    bool              Enabled;
 
     zTCombination();
     bool operator == ( const zTCombination& other ) const;
@@ -18,10 +20,13 @@ namespace GOTHIC_ENGINE {
     void CheckDisable( JOYKEY& keys );
     void Disable();
     bool CheckEnable( JOYKEY& keys );
+    bool CheckCondition();
     void Enable();
     void AddCombination( JOYKEY keys ... );
     void AddEmulation( DXKEY keys ... );
-    void AddFunction( bool (*condition)() );
+    void AddAllowFunctions( LPCONDFUNC conditions ... );
+    void AddDenyFunctions( LPCONDFUNC conditions ... );
+    void Clear();
   };
 
 
@@ -96,6 +101,12 @@ namespace GOTHIC_ENGINE {
     void UpdateRightSticksState();
     void UpdateSticksState();
     void UpdateKeyState();
+    bool SkipVideo();
+    bool ParseControlFile();
+    void ParseControlsCombination( zTCombination& combination, string row );
+    void ParseControlsEmulation( zTCombination& combination, string row );
+    void ParseControlsEndRecord( zTCombination& combination );
+    void ParseControlsCondition( zTCombination& combination, string row );
     Array<zTCombination> KeyCombinations;
     zTVibrationMessage VibrationMessage;
   public:
@@ -125,10 +136,32 @@ namespace GOTHIC_ENGINE {
 
 
 
+  bool Cond_FightMode();
+  bool Cond_FightModeMelee();
+  bool Cond_FightModeRange();
+  bool Cond_FightModeMagic();
+  bool Cond_CanShoot();
+  bool Cond_CanSneaking();
+  bool Cond_Diving();
+  bool Cond_HasFocusVob();
+  bool Cond_HasFocusNpc();
+  bool Cond_TargetIsLocked();
+  bool Cond_OnChooseWeapon();
+  bool Cond_OnSpellBook();
+  bool Cond_InventoryIsOpen();
+  bool Cond_InterfaceIsOpen();
+  bool Cond_InTransformation();
+  bool Cond_CanQuickPotionDrink();
+  bool Cond_VideoIsOpen();
+  bool Cond_CanLockTarget();
+
+
+
 
 #define KEYRECORD_BEGIN { zTCombination _comb;
 #define COMBINATION                     _comb.AddCombination(
 #define EMULATION                 , 0); _comb.AddEmulation(
-#define CONDITION                 , 0); _comb.AddFunction(
-#define KEYRECORD_END                ); KeyCombinations.InsertSorted( _comb ); }
+#define ALLOWCONDITION            , 0); _comb.AddAllowFunctions(
+#define DENYCONDITION             , 0); _comb.AddDenyFunctions(
+#define KEYRECORD_END             , 0); KeyCombinations.InsertSorted( _comb ); }
 }

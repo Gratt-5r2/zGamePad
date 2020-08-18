@@ -338,3 +338,9 @@ ASALocalRun/
 
 # BeatPulse healthcheck temp database
 healthchecksdb
+/zGamePad/G1 Release
+*.tlog
+*.manifest
+*.lastbuildstate
+*.idb
+/zGamePad/G2A Debug

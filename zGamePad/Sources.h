@@ -5,6 +5,7 @@
 #pragma region Includes
 #include "Conditions.cpp"
 #include "Gamepad.cpp"
+#include "ControlParser.cpp"
 #include "ControlOverrides.cpp"
 #include "Hooks.cpp"
 #include "Plugin.cpp"

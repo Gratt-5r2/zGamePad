@@ -33,7 +33,6 @@ namespace GOTHIC_ENGINE {
 
   zTCombination::zTCombination() {
     Enabled = false;
-    Condition = Null;
   }
 
 
@@ -77,8 +76,22 @@ namespace GOTHIC_ENGINE {
 
 
 
+  bool zTCombination::CheckCondition() {
+    for( uint i = 0; i < AllowConditions.GetNum(); i++ )
+      if( !AllowConditions[i]() )
+        return false;
+
+    for( uint i = 0; i < DenyConditions.GetNum(); i++ )
+      if( DenyConditions[i]() )
+        return false;
+    
+    return true;
+  }
+
+
+
   bool zTCombination::CheckEnable( JOYKEY& keys ) {
-    if( Condition && !Condition() )
+    if( !CheckCondition() )
       return false;
 
     JOYKEY flags = keys;
@@ -141,8 +154,37 @@ namespace GOTHIC_ENGINE {
 
 
 
-  void zTCombination::AddFunction( bool (*condition)() ) {
-    Condition = condition;
+  void zTCombination::AddAllowFunctions( bool (*conditions)() ... ) {
+    auto* keys = &conditions;
+
+    for( uint i = 0; true; i++ ) {
+      if( keys[i] == 0 )
+        break;
+
+      AllowConditions += keys[i];
+    }
+  }
+
+
+
+  void zTCombination::AddDenyFunctions( bool( *conditions )() ... ) {
+    auto* keys = &conditions;
+
+    for( uint i = 0; true; i++ ) {
+      if( keys[i] == 0 )
+        break;
+
+      DenyConditions += keys[i];
+    }
+  }
+
+
+
+  void zTCombination::Clear() {
+    Combination.Clear();
+    Emulation.Clear();
+    AllowConditions.Clear();
+    DenyConditions.Clear();
   }
 
 
@@ -269,11 +311,36 @@ namespace GOTHIC_ENGINE {
 
 
 
+  bool zCXInputDevice::SkipVideo() {
+    if( ActiveVideo ) {
+      static CTimer timer;
+      timer.Attach();
+
+      if( KeyStates != 0 ) {
+        if( timer( 0, tickonce, TM_PRIMARY ) ) {
+          keybd_event( VK_ESCAPE, 0, 0, 0 );
+          Sleep( 50 );
+          keybd_event( VK_ESCAPE, 0, KEYEVENTF_KEYUP, 0 );
+        }
+      }
+      else
+        timer.Delete( 0 );
+
+      return true;
+    }
+
+    return false;
+  }
+
+
+
   void zCXInputDevice::UpdateKeyState() {
     XInputGetState( 0, &Gamepad );
     KeyStates = Gamepad.Gamepad.wButtons;
     UpdateSticksState();
 
+    if( SkipVideo() )
+      return;
 
     for( uint i = 0; i < KeyCombinations.GetNum(); i++ )
       KeyCombinations[i].CheckDisable( KeyStates );
@@ -288,8 +355,10 @@ namespace GOTHIC_ENGINE {
 
 
   void zCXInputDevice::UpdateGamePad() {
-    UpdateKeyState();
-    UpdateVibration();
+    //if( player && player->human_ai ) {
+      UpdateKeyState();
+      UpdateVibration();
+    //}
   }
 
 
