@@ -94,4 +94,15 @@ namespace GOTHIC_ENGINE {
     THISCALL( Hook_CGameManager_Init )(hWnd);
     XInputDevice.InitDevice();
   }
+
+
+
+
+  // void __thiscall CGameManager::ApplySomeSettings(void)
+  HOOK Hook_CGameManager_ApplySomeSettings AS( &CGameManager::ApplySomeSettings, &CGameManager::ApplySomeSettings_Union );
+
+  void CGameManager::ApplySomeSettings_Union() {
+    THISCALL( Hook_CGameManager_ApplySomeSettings) ();
+    XInputDevice.UpdateControls();
+  }
 }

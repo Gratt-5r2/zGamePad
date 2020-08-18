@@ -116,6 +116,7 @@ namespace GOTHIC_ENGINE {
     XINPUT_VIBRATION Vibration;
 
     void InitDevice();
+    void UpdateControls();
     void UpdateGamePad();
     void StartVibration( string ptr );
   };

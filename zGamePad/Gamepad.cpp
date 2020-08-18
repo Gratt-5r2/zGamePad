@@ -200,6 +200,13 @@ namespace GOTHIC_ENGINE {
     Capabilities = PXINPUT_CAPABILITIES();
     ZeroMemory( &Gamepad, sizeof( XINPUT_STATE ) );
     KeyStates = (zEXInputKey)0;
+    UpdateControls();
+  }
+
+
+
+  void zCXInputDevice::UpdateControls() {
+    KeyCombinations.Clear();
     InitCombinations();
   }
 

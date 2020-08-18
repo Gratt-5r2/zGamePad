@@ -5,3 +5,4 @@
 
 void GameInit_Union();
 void Init_Union( HWND& );
+void ApplySomeSettings_Union();
