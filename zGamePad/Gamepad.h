@@ -10,11 +10,14 @@ namespace GOTHIC_ENGINE {
     Array<DXKEY>      Emulation;
     Array<bool (*)()> AllowConditions;
     Array<DXKEY>      AllowButtons;
+    Array<DXKEY>      AllowCombinations;
     Array<bool( *)()> DenyConditions;
     Array<DXKEY>      DenyButtons;
+    Array<DXKEY>      DenyCombinations;
     bool              Enabled;
     bool              ToggleMode;
     bool              Toggled;
+    JOYKEY            KeyStates;
 
     zTCombination();
     bool operator == ( const zTCombination& other ) const;
@@ -25,13 +28,16 @@ namespace GOTHIC_ENGINE {
     void Disable();
     bool CheckEnable( JOYKEY& keys );
     bool CheckCondition();
+    bool CheckKeyStateCondition();
     void Enable();
     void AddCombination( JOYKEY keys ... );
     void AddEmulation( DXKEY keys ... );
     void AddAllowFunctions( LPCONDFUNC conditions ... );
     void AddAllowButtons( DXKEY keys ... );
+    void AddAllowCombinations( JOYKEY keys ... );
     void AddDenyFunctions( LPCONDFUNC conditions ... );
     void AddDenyButtons( DXKEY keys ... );
+    void AddDenyCombinations( JOYKEY keys ... );
     void SetEmulationState( bool_t state );
     void Clear();
   };
@@ -108,6 +114,7 @@ namespace GOTHIC_ENGINE {
     void UpdateRightSticksState();
     void UpdateSticksState();
     void UpdateKeyState();
+    void UpdateLastKeyState();
     bool ForceVideoSkipping();
     bool ParseControlFile();
     void ParseControlsCombination( zTCombination& combination, string row );

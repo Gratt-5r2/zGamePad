@@ -35,7 +35,7 @@ namespace GOTHIC_ENGINE {
       oCNpc::s_bTargetLocked = !oCNpc::s_bTargetLocked;
 #endif
 
-    // screen->PrintCX( 1000, AHEX32( zCInputCallback::inputList[0] ) + "  " + A Cond_InterfaceIsOpen() );
+     screen->PrintCX( 1000, AHEX32( zCInputCallback::inputList[0] ) + "  " + A Cond_InterfaceIsOpen() + "  " + A Cond_InventoryIsOpen() );
   }
 
   // Information about current saving or loading world

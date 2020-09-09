@@ -4,3 +4,4 @@
 // Add your methods here
 
 void GetMousePos_Union( float& x, float& y, float& z );
+void ProcessInputEvents_Union();

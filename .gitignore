@@ -345,3 +345,4 @@ healthchecksdb
 *.idb
 /zGamePad/G2A Debug
 /zGamePad/MP Release
+*.txt

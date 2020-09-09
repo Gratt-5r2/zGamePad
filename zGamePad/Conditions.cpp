@@ -231,14 +231,46 @@ namespace GOTHIC_ENGINE {
 
 
   bool Cond_InventoryIsOpen() {
+    zCInputCallback* topCallback = zCInputCallback::inputList.GetNextInList()->GetData();
+#if ENGINE <= Engine_G1A
+    // √овно-FIX: посреди торгового диалога вылазит сраное окошко
+    // подтверждени€, которое не детектитс€ проверкой на интерфейс.
+    oCViewDialogTrade* dialogTrade = dynamic_cast<oCViewDialogTrade*>(topCallback);
+    if( dialogTrade && dialogTrade->DlgChoice->IsActive() )
+      return false;
+#endif
     return player && player->inventory2.IsOpen();
   }
 
 
 
+  // √овно-FIX: кароче через choice диалог открываешь торговый инвентарь,
+  // закрываешь, выходишь из диалога и видишь, как в списке калбеков
+  // висит объект диалога. ‘икситс€ вот так.
+  static void FixEmptyDialog() {
+    zCInputCallback* topCallback = zCInputCallback::inputList.GetNextInList()->GetData();
+
+    zCViewDialog* dialog = dynamic_cast<zCViewDialog*>(topCallback);
+    if( dialog && dialog->IsDone )
+      zCInputCallback::inputList.Remove( dialog );
+  }
+
+
+
   bool Cond_InterfaceIsOpen() {
-    bool isInterfaceActive = zCInputCallback::inputList.GetNextInList()->GetData() != ogame || Cond_OnSpellBook() || Cond_OnChooseWeapon();
-    bool isOtherConditions = !Cond_InventoryIsOpen() /*&& !Cond_FightMode()*/;
+    FixEmptyDialog();
+    zCInputCallback* topCallback = zCInputCallback::inputList.GetNextInList()->GetData();
+
+#if ENGINE <= Engine_G1A
+    // √овно-FIX: посреди торгового диалога вылазит сраное окошко
+    // подтверждени€, которое не детектитс€ проверкой на интерфейс.
+    oCViewDialogTrade* dialogTrade = dynamic_cast<oCViewDialogTrade*>(topCallback);
+    if( dialogTrade && dialogTrade->DlgChoice->IsActive() )
+      return true;
+#endif
+    bool isInterfaceActive = topCallback != ogame || Cond_OnSpellBook() || Cond_OnChooseWeapon();
+    bool isOtherConditions = !Cond_InventoryIsOpen();
+
     return isInterfaceActive && isOtherConditions;
   }
 

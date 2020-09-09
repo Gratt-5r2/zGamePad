@@ -80,6 +80,12 @@ namespace GOTHIC_ENGINE {
 
 
 
+  bool HasFlag( int value, int flag ) {
+    return (value & flag) == flag;
+  }
+
+
+
   bool zTCombination::CheckCondition() {
     for( uint i = 0; i < AllowConditions.GetNum(); i++ )
       if( !AllowConditions[i]() )
@@ -97,6 +103,23 @@ namespace GOTHIC_ENGINE {
       if( zinput->KeyPressed( DenyButtons[i] ) )
         return false;
     
+    if( !CheckKeyStateCondition() )
+      return false;
+
+    return true;
+  }
+
+
+
+  bool zTCombination::CheckKeyStateCondition() {
+    for( uint i = 0; i < AllowCombinations.GetNum(); i++ )
+      if( !HasFlag( KeyStates, AllowCombinations[i] ) )
+        return false;
+
+    for( uint i = 0; i < DenyCombinations.GetNum(); i++ )
+      if( HasFlag( KeyStates, DenyCombinations[i] ) )
+        return false;
+
     return true;
   }
 
@@ -224,6 +247,32 @@ namespace GOTHIC_ENGINE {
 
 
 
+  void zTCombination::AddAllowCombinations( DXKEY keys ... ) {
+    auto* __keys = &keys;
+
+    for( uint i = 0; true; i++ ) {
+      if( __keys[i] == 0 )
+        break;
+
+      AllowCombinations += __keys[i];
+    }
+  }
+
+
+
+  void zTCombination::AddDenyCombinations( DXKEY keys ... ) {
+    auto* __keys = &keys;
+
+    for( uint i = 0; true; i++ ) {
+      if( __keys[i] == 0 )
+        break;
+
+      DenyCombinations += __keys[i];
+    }
+  }
+
+
+
   void zTCombination::SetEmulationState( bool_t state ) {
     for( uint i = 0; i < Emulation.GetNum(); i++ )
       SetKeyStateAndInsert( Emulation[i], state );
@@ -238,8 +287,11 @@ namespace GOTHIC_ENGINE {
     DenyConditions.Clear();
     AllowButtons.Clear();
     DenyButtons.Clear();
+    AllowCombinations.Clear();
+    DenyCombinations.Clear();
     ToggleMode = false;
     Toggled = false;
+    KeyStates = None;
   }
 
 
@@ -263,6 +315,10 @@ namespace GOTHIC_ENGINE {
   void zCXInputDevice::UpdateControls() {
     KeyCombinations.Clear();
     InitCombinations();
+
+    XInputGetState( 0, &Gamepad );
+    for( uint i = 0; i < KeyCombinations.GetNum(); i++ )
+      KeyCombinations[i].KeyStates = Gamepad.Gamepad.wButtons;
   }
 
 
@@ -407,11 +463,17 @@ namespace GOTHIC_ENGINE {
     for( uint i = 0; i < KeyCombinations.GetNum(); i++ )
       KeyCombinations[i].CheckDisable( KeyStates );
     
-    if( KeyStates ) {
+    if( KeyStates )
       for( uint i = 0; i < KeyCombinations.GetNum(); i++ )
-        if( KeyCombinations[i].CheckEnable( KeyStates ) )
-          /*break*/ continue;
-    }
+        KeyCombinations[i].CheckEnable( KeyStates );
+
+    UpdateLastKeyState();
+  }
+
+
+  void zCXInputDevice::UpdateLastKeyState() {
+    for( uint i = 0; i < KeyCombinations.GetNum(); i++ )
+      KeyCombinations[i].KeyStates = Gamepad.Gamepad.wButtons;
   }
 
 

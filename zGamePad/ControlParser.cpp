@@ -90,11 +90,23 @@ namespace GOTHIC_ENGINE {
       }
 
       // 
-      DXKEY key = GetEmulationKeyCode( token );
-      if( key != None ) {
-        if( !isNot ) combination.AddAllowButtons( key, 0 );
+      DXKEY dxKey = GetEmulationKeyCode( token );
+      if( dxKey != None ) {
+        if( !isNot ) combination.AddAllowButtons( dxKey, 0 );
         else {
-          combination.AddDenyButtons( key, 0 );
+          combination.AddDenyButtons( dxKey, 0 );
+          isNot = false;
+        }
+
+        continue;
+      }
+
+      // 
+      JOYKEY joyKey = GetCombinationKeyCode( token );
+      if( joyKey != None ) {
+        if( !isNot ) combination.AddAllowCombinations( joyKey, 0 );
+        else {
+          combination.AddDenyCombinations( joyKey, 0 );
           isNot = false;
         }
 
