@@ -3,3 +3,4 @@
 // User API for zCInput
 // Add your methods here
 
+float GetState_Union( unsigned short );

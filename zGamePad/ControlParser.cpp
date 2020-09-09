@@ -79,14 +79,29 @@ namespace GOTHIC_ENGINE {
 
       // Find function by name
       LPCONDFUNC func = GetConditionFunction( token );
-      if( func == Null )
-        Message::Fatal( "Unknown control condition: " + token );
+      if( func != Null ) {
+        if( !isNot ) combination.AddAllowFunctions( func, 0 );
+        else {
+          combination.AddDenyFunctions( func, 0 );
+          isNot = false;
+        }
 
-      if( !isNot ) combination.AddAllowFunctions( func, 0 );
-      else {
-        combination.AddDenyFunctions( func, 0 );
-        isNot = false;
+        continue;
       }
+
+      // 
+      DXKEY key = GetEmulationKeyCode( token );
+      if( key != None ) {
+        if( !isNot ) combination.AddAllowButtons( key, 0 );
+        else {
+          combination.AddDenyButtons( key, 0 );
+          isNot = false;
+        }
+
+        continue;
+      }
+
+      Message::Fatal( "Unknown control condition: " + token );
     }
   }
 
@@ -94,11 +109,12 @@ namespace GOTHIC_ENGINE {
 
   bool zCXInputDevice::ParseControlFile() {
     // Check external control file
+    string defaultControlsFileName = "Controls.Gamepad";
     string controlsFileName;
-    GetOptions().Read( controlsFileName, "zGamePad", "ControlsFile", "" );
+    GetOptions().Read( controlsFileName, "zGamePad", "ControlsFile", defaultControlsFileName );
 
     if( controlsFileName.IsEmpty() )
-      return false;
+      controlsFileName = defaultControlsFileName;
 
     cmd << "Load custom controls . . ." << endl;
 
@@ -106,7 +122,11 @@ namespace GOTHIC_ENGINE {
     zTCombination combination;
 
     string controlsFile;
-    controlsFile.ReadFromVdf( controlsFileName, VDF_DEFAULT | VDF_PHYSICALFIRST );
+    if( !controlsFile.ReadFromVdf( controlsFileName, VDF_DEFAULT | VDF_PHYSICALFIRST ) ) {
+      cmd << "Controls not found" << endl;
+      return false;
+    }
+
     rowString controlsRows = controlsFile;
 
     for( uint i = 0; i < controlsRows.GetNum(); i++ ) {
@@ -122,11 +142,17 @@ namespace GOTHIC_ENGINE {
       
       // Check command
       if( command == "KeyRecord" ) {
+
         // End record and start new
         if( initialized ) {
           ParseControlsEndRecord( combination );
           combination.Clear();
         }
+
+        // One press - one click ??
+        string mode = row.GetWordSmart( 2, true );
+        if( mode == "Toggled" )
+          combination.ToggleMode = true;
 
         initialized = true;
         continue;

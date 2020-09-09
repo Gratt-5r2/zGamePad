@@ -9,8 +9,12 @@ namespace GOTHIC_ENGINE {
     Array<JOYKEY>     Combination;
     Array<DXKEY>      Emulation;
     Array<bool (*)()> AllowConditions;
+    Array<DXKEY>      AllowButtons;
     Array<bool( *)()> DenyConditions;
+    Array<DXKEY>      DenyButtons;
     bool              Enabled;
+    bool              ToggleMode;
+    bool              Toggled;
 
     zTCombination();
     bool operator == ( const zTCombination& other ) const;
@@ -25,14 +29,17 @@ namespace GOTHIC_ENGINE {
     void AddCombination( JOYKEY keys ... );
     void AddEmulation( DXKEY keys ... );
     void AddAllowFunctions( LPCONDFUNC conditions ... );
+    void AddAllowButtons( DXKEY keys ... );
     void AddDenyFunctions( LPCONDFUNC conditions ... );
+    void AddDenyButtons( DXKEY keys ... );
+    void SetEmulationState( bool_t state );
     void Clear();
   };
 
 
 
   struct zTVibrationMessage {
-    CTimer Timer;
+    Timer  Timer;
     uint   Index;
     string Pattern;
   };

@@ -33,6 +33,7 @@ namespace GOTHIC_ENGINE {
 
   zTCombination::zTCombination() {
     Enabled = false;
+    Clear();
   }
 
 
@@ -70,8 +71,11 @@ namespace GOTHIC_ENGINE {
       return;
 
     Enabled = false;
-    for( uint i = 0; i < Emulation.GetNum(); i++ )
-      SetKeyStateAndInsert( Emulation[i], False );
+    if( !Toggled )
+      return;
+
+    Toggled = false;
+    SetEmulationState( False );
   }
 
 
@@ -83,6 +87,14 @@ namespace GOTHIC_ENGINE {
 
     for( uint i = 0; i < DenyConditions.GetNum(); i++ )
       if( DenyConditions[i]() )
+        return false;
+
+    for( uint i = 0; i < AllowButtons.GetNum(); i++ )
+      if( !zinput->KeyPressed( AllowButtons[i] ) )
+        return false;
+
+    for( uint i = 0; i < DenyButtons.GetNum(); i++ )
+      if( zinput->KeyPressed( DenyButtons[i] ) )
         return false;
     
     return true;
@@ -118,12 +130,18 @@ namespace GOTHIC_ENGINE {
 
 
   void zTCombination::Enable() {
-    if( Enabled )
+    if( Enabled ) {
+      if( ToggleMode && Toggled ) {
+        Toggled = false;
+        SetEmulationState( False );
+      }
+
       return;
+    }
 
     Enabled = true;
-    for( uint i = 0; i < Emulation.GetNum(); i++ )
-      SetKeyStateAndInsert( Emulation[i], True );
+    Toggled = true;
+    SetEmulationState( True );
   }
 
 
@@ -180,11 +198,48 @@ namespace GOTHIC_ENGINE {
 
 
 
+  void zTCombination::AddAllowButtons( DXKEY keys ... ) {
+    auto* __keys = &keys;
+
+    for( uint i = 0; true; i++ ) {
+      if( __keys[i] == 0 )
+        break;
+
+      AllowButtons += __keys[i];
+    }
+  }
+
+
+
+  void zTCombination::AddDenyButtons( DXKEY keys ... ) {
+    auto* __keys = &keys;
+
+    for( uint i = 0; true; i++ ) {
+      if( __keys[i] == 0 )
+        break;
+
+      DenyButtons += __keys[i];
+    }
+  }
+
+
+
+  void zTCombination::SetEmulationState( bool_t state ) {
+    for( uint i = 0; i < Emulation.GetNum(); i++ )
+      SetKeyStateAndInsert( Emulation[i], state );
+  }
+
+
+
   void zTCombination::Clear() {
     Combination.Clear();
     Emulation.Clear();
     AllowConditions.Clear();
     DenyConditions.Clear();
+    AllowButtons.Clear();
+    DenyButtons.Clear();
+    ToggleMode = false;
+    Toggled = false;
   }
 
 
@@ -216,8 +271,8 @@ namespace GOTHIC_ENGINE {
     if( VibrationMessage.Index == Invalid )
       return;
 
-    VibrationMessage.Timer.Attach();
-    if( VibrationMessage.Timer( 0, 150, TM_PRIMARY ) ) {
+    VibrationMessage.Timer.ClearUnused();
+    if( VibrationMessage.Timer[0u].Await( 150, true ) ) {
 
       string strength = VibrationMessage.Pattern.GetWordSmart( ++VibrationMessage.Index );
       if( strength.IsEmpty() ) {
@@ -244,8 +299,8 @@ namespace GOTHIC_ENGINE {
 
   void zCXInputDevice::UpdateLeftSticksState() {
     static bool runActive = false;
-    static CTimer timer;
-    timer.Attach();
+    static Timer timer;
+    timer.ClearUnused();
 
     // Maximum of Triggers or Sticks - 65536
     LeftStick.X = Gamepad.Gamepad.sThumbLX;
@@ -262,7 +317,7 @@ namespace GOTHIC_ENGINE {
       else {
         // Check run
         if( LeftStick.Y > 0 ) {
-          if( runActive || timer( 0, 20 ) ) {
+          if( runActive || timer[0u].Await( 20 ) ) {
             runActive = true;
 
             // Walk situations
@@ -279,7 +334,7 @@ namespace GOTHIC_ENGINE {
     }
     else if( runActive ) {
       runActive = false;
-      timer.Delete( 0 );
+      timer[0u].Delete();
     }
   }
 
@@ -371,6 +426,6 @@ namespace GOTHIC_ENGINE {
   void zCXInputDevice::StartVibration( string ptr ) {
     VibrationMessage.Index = 0;
     VibrationMessage.Pattern = ptr;
-    VibrationMessage.Timer.Delete(0);
+    VibrationMessage.Timer[0u];
   }
 }

@@ -7,6 +7,7 @@
 #include "Gamepad.cpp"
 #include "ControlParser.cpp"
 #include "ControlOverrides.cpp"
+#include "FocusNpc.cpp"
 #include "Hooks.cpp"
 #include "Plugin.cpp"
 #pragma endregion

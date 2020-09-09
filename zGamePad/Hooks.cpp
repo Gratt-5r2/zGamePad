@@ -97,12 +97,41 @@ namespace GOTHIC_ENGINE {
 
 
 
-
   // void __thiscall CGameManager::ApplySomeSettings(void)
   HOOK Hook_CGameManager_ApplySomeSettings AS( &CGameManager::ApplySomeSettings, &CGameManager::ApplySomeSettings_Union );
 
   void CGameManager::ApplySomeSettings_Union() {
     THISCALL( Hook_CGameManager_ApplySomeSettings) ();
     XInputDevice.UpdateControls();
+  }
+
+
+
+
+  int oCAIHuman::Pressed_Union( int key ) {
+    if( key == GAME_ACTION )
+      if( !Pressed( GAME_UP ) && !Pressed( GAME_LEFT ) && !Pressed( GAME_RIGHT ) && !Pressed( GAME_STRAFELEFT ) && !Pressed( GAME_STRAFERIGHT ) )
+        if( IsStateAniActive( _t_hitf ) || IsStateAniActive( _t_hitl ) || IsStateAniActive( _t_hitr ) )
+          return True;
+
+    return False;
+  }
+
+
+
+
+  HOOK Hook_zCInput_Win32_GetState AS( &zCInput_Win32::GetState, &zCInput::GetState_Union );
+
+  float zCInput::GetState_Union( unsigned short key ) {
+    if( key == GAME_ACTION ) {
+      if( player && player->human_ai ) {
+        if( player->human_ai->Pressed_Union( key ) )
+          return True;
+      }
+      //else
+      //  return True;
+    }
+
+    return THISCALL( Hook_zCInput_Win32_GetState )(key);
   }
 }
