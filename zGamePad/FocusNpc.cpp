@@ -8,7 +8,7 @@ namespace GOTHIC_ENGINE {
     zVEC2 vector2D = zVEC2( vector3D[VX], vector3D[VZ] );
     zVEC3 lookAt3D = killer->GetAtVectorWorld();
     zVEC2 lookAt2D = zVEC2( lookAt3D[VX], lookAt3D[VZ] );
-    return /*RAD360 -*/ vector2D.Rotate( -lookAt2D.GetAngle() ).GetAngle(); // lookAt2D vector2D
+    return vector2D.Rotate( -lookAt2D.GetAngle() ).GetAngle();
   }
 
 
@@ -67,16 +67,11 @@ namespace GOTHIC_ENGINE {
 
   // Check focus npc
   void CheckDeadTarget() {
-    static bool_t targetEnabled = False;
-    targetEnabled = oCNpc::s_bTargetLocked;
-
     oCNpc* targetNpc = player->GetFocusNpc();
-    if( targetNpc && (targetNpc->IsDead() || targetNpc->IsUnconscious()) ) {
-      GetNextEnemy();
-
-      if( player->GetFocusNpc() )
-        oCNpc::s_bTargetLocked = targetEnabled;
-    }
+    if( targetNpc && (targetNpc->IsDead() || targetNpc->IsUnconscious()) )
+      if( oCNpc::s_bTargetLocked )
+        if( !GetNextEnemy() )
+          oCNpc::s_bTargetLocked = False;
   }
 
 
@@ -86,7 +81,8 @@ namespace GOTHIC_ENGINE {
     if( !player )
       return;
 
-    if( player->fmode == NPC_WEAPON_NONE )
+    oCNpc* targetNpc = player->GetFocusNpc();
+    if( player->fmode == NPC_WEAPON_NONE || !targetNpc )
       oCNpc::s_bTargetLocked = False;
 
     static zCView* target = Null;
@@ -105,7 +101,6 @@ namespace GOTHIC_ENGINE {
     CheckDeadTarget();
 
     if( oCNpc::s_bTargetLocked ) {
-      oCNpc* targetNpc = player->GetFocusNpc();
       zVEC3 position = targetNpc->GetPositionWorld();
 
       int x, y;

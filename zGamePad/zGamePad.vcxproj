@@ -522,6 +522,10 @@
   <ItemGroup>
     <ClInclude Include="Plugin.h" />
     <ClInclude Include="Headers.h" />
+    <ClInclude Include="SaveMenu.cpp">
+      <SubType>
+      </SubType>
+    </ClInclude>
     <ClInclude Include="Sources.h" />
     <ClInclude Include="UnionAfx.h" />
     <ClInclude Include="ZenGin\Gothic_II_Addon\API\oAiHuman.h" />

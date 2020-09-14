@@ -9,6 +9,7 @@
 #include "ControlOverrides.cpp"
 #include "FocusNpc.cpp"
 #include "Hooks.cpp"
+#include "SaveMenu.cpp"
 #include "Plugin.cpp"
 #pragma endregion
 

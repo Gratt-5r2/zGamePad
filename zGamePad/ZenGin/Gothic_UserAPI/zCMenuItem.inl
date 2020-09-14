@@ -3,3 +3,4 @@
 // User API for zCMenuItem
 // Add your methods here
 
+int Input_Union( int, zSTRING& );

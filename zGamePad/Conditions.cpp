@@ -230,14 +230,63 @@ namespace GOTHIC_ENGINE {
 
 
 
+  static bool PlayerIsTalking() {
+    if( !player )
+      return true; // for interfaces
+
+    if( player->GetTalkingWith() ) {
+      static int index = parser->GetIndex( "ZS_TALK" );
+      if( player->state.IsInState( index ) || player->GetTalkingWith()->state.IsInState( index ) )
+        return true;
+    }
+
+    return false;
+  }
+
+
+
+  bool Cond_TopCallbackIsDialog() {
+    zCInputCallback* topCallback = zCInputCallback::inputList.GetNextInList()->GetData();
+    zCViewDialog* dialog = dynamic_cast<zCViewDialog*>(topCallback);
+    return dialog != Null && oCInformationManager::GetInformationManager().IsDone == 0;
+  }
+
+
+
+  bool Cond_TopCallbackIsTradeDialog() {
+#if ENGINE <= Engine_G1A
+    zCInputCallback* topCallback = zCInputCallback::inputList.GetNextInList()->GetData();
+    oCViewDialogTrade* dialogTrade = dynamic_cast<oCViewDialogTrade*>(topCallback);
+    if( dialogTrade && dialogTrade->DlgChoice && dialogTrade->DlgChoice->IsActive() )
+      return true;
+
+    return false;
+#else
+    return true;
+#endif
+  }
+
+
+
+  bool Cond_TopCallbackIsMenu() {
+    zCInputCallback* topCallback = zCInputCallback::inputList.GetNextInList()->GetData();
+    zCMenu* menu = dynamic_cast<zCMenu*>(topCallback);
+    if( menu )
+      return true;
+
+    zCMenuItem* item = dynamic_cast<zCMenuItem*>(topCallback);
+    return item != Null;
+  }
+
+
+
   bool Cond_InventoryIsOpen() {
     zCInputCallback* topCallback = zCInputCallback::inputList.GetNextInList()->GetData();
 #if ENGINE <= Engine_G1A
     // Говно-FIX: посреди торгового диалога вылазит сраное окошко
     // подтверждения, которое не детектится проверкой на интерфейс.
-    oCViewDialogTrade* dialogTrade = dynamic_cast<oCViewDialogTrade*>(topCallback);
-    if( dialogTrade && dialogTrade->DlgChoice->IsActive() )
-      return false;
+    if( Cond_TopCallbackIsTradeDialog() )
+      return true;
 #endif
     return player && player->inventory2.IsOpen();
   }
@@ -257,18 +306,22 @@ namespace GOTHIC_ENGINE {
 
 
 
+
+
+
   bool Cond_InterfaceIsOpen() {
-    FixEmptyDialog();
+    //FixEmptyDialog();
     zCInputCallback* topCallback = zCInputCallback::inputList.GetNextInList()->GetData();
+
 
 #if ENGINE <= Engine_G1A
     // Говно-FIX: посреди торгового диалога вылазит сраное окошко
     // подтверждения, которое не детектится проверкой на интерфейс.
-    oCViewDialogTrade* dialogTrade = dynamic_cast<oCViewDialogTrade*>(topCallback);
-    if( dialogTrade && dialogTrade->DlgChoice->IsActive() )
+    if( Cond_TopCallbackIsTradeDialog() )
       return true;
 #endif
-    bool isInterfaceActive = topCallback != ogame || Cond_OnSpellBook() || Cond_OnChooseWeapon();
+    bool isInDialogState   = oCInformationManager::GetInformationManager().IsDone == 0;
+    bool isInterfaceActive = /*(topCallback != ogame && !Cond_TopCallbackIsDialog())*/ Cond_TopCallbackIsMenu() || Cond_TopCallbackIsDialog() || Cond_OnSpellBook() || Cond_OnChooseWeapon() || PlayerIsTalking();
     bool isOtherConditions = !Cond_InventoryIsOpen();
 
     return isInterfaceActive && isOtherConditions;

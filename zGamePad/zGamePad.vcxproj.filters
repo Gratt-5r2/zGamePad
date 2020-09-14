@@ -2813,6 +2813,9 @@
     <ClInclude Include="FocusNpc.cpp">
       <Filter>Plugin\Workspace\Gamepad\Helpers</Filter>
     </ClInclude>
+    <ClInclude Include="SaveMenu.cpp">
+      <Filter>Plugin\Workspace\Gamepad\Helpers</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <None Include=".build_settings.inl">

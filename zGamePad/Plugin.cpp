@@ -11,6 +11,17 @@ namespace GOTHIC_ENGINE {
   void Game_Exit() {
   }
 
+  inline zSTRING GetInfoName() {
+    switch( oCInformationManager::GetInformationManager().Mode ) {
+      case oCInformationManager::INFO_MGR_MODE_IMPORTANT: return "INFO_MGR_MODE_IMPORTANT";
+      case oCInformationManager::INFO_MGR_MODE_INFO:      return "INFO_MGR_MODE_INFO";
+      case oCInformationManager::INFO_MGR_MODE_CHOICE:    return "INFO_MGR_MODE_CHOICE";
+      case oCInformationManager::INFO_MGR_MODE_TRADE:     return "INFO_MGR_MODE_TRADE";
+    }
+   
+    return "...";
+  }
+
   void Game_Loop() {
     static bool InterfaceInitialized_GetMousePos = false;
     if( !InterfaceInitialized_GetMousePos ) {
@@ -34,9 +45,9 @@ namespace GOTHIC_ENGINE {
     if( zKeyToggled( KEY_F13 ) && player->GetFocusNpc() )
       oCNpc::s_bTargetLocked = !oCNpc::s_bTargetLocked;
 #endif
-
-     screen->PrintCX( 1000, AHEX32( zCInputCallback::inputList[0] ) + "  " + A Cond_InterfaceIsOpen() + "  " + A Cond_InventoryIsOpen() );
   }
+
+
 
   // Information about current saving or loading world
   TSaveLoadGameInfo& SaveLoadGameInfo = UnionCore::SaveLoadGameInfo;
