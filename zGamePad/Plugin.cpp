@@ -44,6 +44,8 @@ namespace GOTHIC_ENGINE {
 #if ENGINE <= Engine_G1A
     if( zKeyToggled( KEY_F13 ) && player->GetFocusNpc() )
       oCNpc::s_bTargetLocked = !oCNpc::s_bTargetLocked;
+
+    player->TurnToEnemyInAttack();
 #endif
   }
 

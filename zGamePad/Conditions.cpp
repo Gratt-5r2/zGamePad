@@ -253,6 +253,22 @@ namespace GOTHIC_ENGINE {
 
 
 
+  bool Cond_TopCallbackIsDocument() {
+    zCInputCallback* topCallback = zCInputCallback::inputList.GetNextInList()->GetData();
+    oCViewDocument* document = dynamic_cast<oCViewDocument*>(topCallback);
+    if( document != Null )
+      return true;
+
+    oCDoc* doc = dynamic_cast<oCDoc*>(topCallback);
+    if( doc != Null )
+      return true;
+
+    oCDocumentManager* docMan = dynamic_cast<oCDocumentManager*>(topCallback);
+    return docMan != Null;
+  }
+
+
+
   bool Cond_TopCallbackIsTradeDialog() {
 #if ENGINE <= Engine_G1A
     zCInputCallback* topCallback = zCInputCallback::inputList.GetNextInList()->GetData();
@@ -321,8 +337,14 @@ namespace GOTHIC_ENGINE {
       return true;
 #endif
     bool isInDialogState   = oCInformationManager::GetInformationManager().IsDone == 0;
-    bool isInterfaceActive = /*(topCallback != ogame && !Cond_TopCallbackIsDialog())*/ Cond_TopCallbackIsMenu() || Cond_TopCallbackIsDialog() || Cond_OnSpellBook() || Cond_OnChooseWeapon() || PlayerIsTalking();
     bool isOtherConditions = !Cond_InventoryIsOpen();
+    bool isInterfaceActive =
+      Cond_TopCallbackIsMenu()     || 
+      Cond_TopCallbackIsDocument() ||
+      Cond_TopCallbackIsDialog()   || 
+      Cond_OnSpellBook()           || 
+      Cond_OnChooseWeapon()        || 
+      PlayerIsTalking();
 
     return isInterfaceActive && isOtherConditions;
   }

@@ -18,8 +18,10 @@ void GetNearestVob_Union( float max_dist );
 static int s_bTargetLocked;
 void CollectFocusVob_Union();
 int IsDead_Union() { return attribute[NPC_ATR_HITPOINTS] <= 0; }
+void TurnToEnemyInAttack();
 #endif
 
+Array<oCNpc*> GetNearestFightNpcList();
 oCNpc* oCNpc::GetNearestFightNpcRight_Union();
 oCNpc* oCNpc::GetNearestFightNpcLeft_Union();
 oCNpc* oCNpc::GetNearestFightNpc_Union();

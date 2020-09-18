@@ -64,6 +64,23 @@ namespace GOTHIC_ENGINE {
   }
 
 
+  //
+  Array<oCNpc*> oCNpc::GetNearestFightNpcList() {
+    zCArray<zCVob*> vobList;
+    Array<oCNpc*>   npcList;
+    CreateVobList( vobList, (float)GetFightRange() * 3.5f );
+
+    for( int i = 0; i < vobList.GetNum(); i++ ) {
+      oCNpc* npc = vobList[i]->CastTo<oCNpc>();
+      if( npc && !npc->IsDead() && !npc->IsUnconscious() )
+        if( player->focus_vob != npc && npc != player && CanSee( npc, True ) )
+          npcList.Insert( npc );
+    }
+
+    return npcList;
+  }
+
+
 
   // Check focus npc
   void CheckDeadTarget() {
@@ -121,20 +138,11 @@ namespace GOTHIC_ENGINE {
 
   // 
   oCNpc* oCNpc::GetNearestFightNpcRight_Union() {
-    zCArray<zCVob*> vobList;
-    zCArray<oCNpc*> npcList;
-    CreateVobList( vobList, (float)GetFightRange() * 2.0f );
-
-    for( int i = 0; i < vobList.GetNum(); i++ ) {
-      oCNpc* npc = vobList[i]->CastTo<oCNpc>();
-      if( npc && !npc->IsDead() && !npc->IsUnconscious() )
-        if( player->focus_vob != npc && npc != player )
-          npcList.Insert( npc );
-    }
+    Array<oCNpc*> npcList = GetNearestFightNpcList();
 
     oCNpc* nearestNpc  = Null;
     float nearestAngle = RAD360;
-    for( int i = 0; i < npcList.GetNum(); i++ ) {
+    for( uint i = 0; i < npcList.GetNum(); i++ ) {
 
       float angle = GetAngleBetweenNpcs( this, npcList[i] );
       if( angle < nearestAngle ) {
@@ -150,20 +158,11 @@ namespace GOTHIC_ENGINE {
 
   // 
   oCNpc* oCNpc::GetNearestFightNpcLeft_Union() {
-    zCArray<zCVob*> vobList;
-    zCArray<oCNpc*> npcList;
-    CreateVobList( vobList, (float)GetFightRange() * 2.0f );
-
-    for( int i = 0; i < vobList.GetNum(); i++ ) {
-      oCNpc* npc = vobList[i]->CastTo<oCNpc>();
-      if( npc && !npc->IsDead() && !npc->IsUnconscious() )
-        if( player->focus_vob != npc && npc != player )
-          npcList.Insert( npc );
-    }
+    Array<oCNpc*> npcList = GetNearestFightNpcList();
 
     oCNpc* nearestNpc  = Null;
     float nearestAngle = RAD360;
-    for( int i = 0; i < npcList.GetNum(); i++ ) {
+    for( uint i = 0; i < npcList.GetNum(); i++ ) {
 
       float angle = RAD360 - GetAngleBetweenNpcs( this, npcList[i] );
       if( angle < nearestAngle ) {
@@ -179,20 +178,11 @@ namespace GOTHIC_ENGINE {
 
   // 
   oCNpc* oCNpc::GetNearestFightNpc_Union() {
-    zCArray<zCVob*> vobList;
-    zCArray<oCNpc*> npcList;
-    CreateVobList( vobList, (float)GetFightRange() * 2.0f );
-
-    for( int i = 0; i < vobList.GetNum(); i++ ) {
-      oCNpc* npc = vobList[i]->CastTo<oCNpc>();
-      if( npc && !npc->IsDead() && !npc->IsUnconscious() )
-        if( player->focus_vob != npc && npc != player )
-          npcList.Insert( npc );
-    }
+    Array<oCNpc*> npcList = GetNearestFightNpcList();
 
     oCNpc* nearestNpc  = Null;
     float nearestAngle = RAD360;
-    for( int i = 0; i < npcList.GetNum(); i++ ) {
+    for( uint i = 0; i < npcList.GetNum(); i++ ) {
 
       float angle = RAD360 - GetAngleBetweenNpcs( this, npcList[i] );
       if( angle > RAD180 )
@@ -224,6 +214,21 @@ namespace GOTHIC_ENGINE {
     }
 
     THISCALL( Hook_oCNpc_CollectFocusVob )();
+  }
+
+
+
+  void oCNpc::TurnToEnemyInAttack() {
+    if( !human_ai )
+      return;
+
+    bool isFightAni =
+      human_ai->IsStateAniActive( human_ai->_t_hitl ) ||
+      human_ai->IsStateAniActive( human_ai->_t_hitr ) ||
+      human_ai->IsStateAniActive( human_ai->_t_hitf );
+
+    if( isFightAni && focus_vob )
+      Turn( focus_vob->GetPositionWorld() );
   }
 #endif
 }
