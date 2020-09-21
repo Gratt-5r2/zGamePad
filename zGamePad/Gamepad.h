@@ -169,6 +169,8 @@ namespace GOTHIC_ENGINE {
   bool Cond_CanQuickPotionDrink();
   bool Cond_VideoIsOpen();
   bool Cond_CanLockTarget();
+  bool Cond_G1();
+  bool Cond_G2();
 
 
 

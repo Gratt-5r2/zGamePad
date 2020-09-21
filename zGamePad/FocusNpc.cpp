@@ -65,15 +65,23 @@ namespace GOTHIC_ENGINE {
 
 
   //
+  static int CanSeeEnemy( oCNpc* npc1, oCNpc* npc2 ) {
+    return
+      npc1->CanSee( npc2, True ) ||
+      npc2->CanSee( ogame->GetCameraVob(), True );
+  }
+
+
+  //
   Array<oCNpc*> oCNpc::GetNearestFightNpcList() {
     zCArray<zCVob*> vobList;
     Array<oCNpc*>   npcList;
-    CreateVobList( vobList, (float)GetFightRange() * 3.5f );
+    CreateVobList( vobList, oCNpcFocus::focus->GetMaxRange() );
 
     for( int i = 0; i < vobList.GetNum(); i++ ) {
       oCNpc* npc = vobList[i]->CastTo<oCNpc>();
       if( npc && !npc->IsDead() && !npc->IsUnconscious() )
-        if( player->focus_vob != npc && npc != player && CanSee( npc, True ) )
+        if( player->focus_vob != npc && npc != player && CanSeeEnemy( this, npc ) )
           npcList.Insert( npc );
     }
 

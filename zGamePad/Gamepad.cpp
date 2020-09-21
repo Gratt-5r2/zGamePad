@@ -452,8 +452,18 @@ namespace GOTHIC_ENGINE {
 
 
 
+  int GetGamepadID() {
+    int gamepadID = 0;
+    Union.GetSysPackOption().Read( gamepadID, "ZGAMEPAD", "ControllerID", gamepadID );
+    return min( 3, max( 0, gamepadID ) );
+  }
+
+
+
   void zCXInputDevice::UpdateKeyState() {
-    XInputGetState( 0, &Gamepad );
+    static int gamepadID = GetGamepadID();
+
+    XInputGetState( gamepadID, &Gamepad );
     KeyStates = Gamepad.Gamepad.wButtons;
     UpdateSticksState();
 
@@ -468,6 +478,21 @@ namespace GOTHIC_ENGINE {
         KeyCombinations[i].CheckEnable( KeyStates );
 
     UpdateLastKeyState();
+
+
+
+    if( player ) {
+      static Timer helper;
+      helper.ClearUnused();
+      KeyStates = Gamepad.Gamepad.wButtons;
+
+      if( (KeyStates & JOY_LSTICK) && (KeyStates & JOY_RSTICK) ) {
+        if( helper[0u].Await( 2000 ) )
+          player->EmergencyResetPos( player->GetPositionWorld() );
+      }
+      else
+        helper[0u].Delete();
+    }
   }
 
 

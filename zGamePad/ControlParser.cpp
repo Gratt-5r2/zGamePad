@@ -128,8 +128,6 @@ namespace GOTHIC_ENGINE {
     if( controlsFileName.IsEmpty() )
       controlsFileName = defaultControlsFileName;
 
-    cmd << "Load custom controls . . ." << endl;
-
     bool initialized = false;
     zTCombination combination;
 

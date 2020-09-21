@@ -147,6 +147,57 @@ namespace GOTHIC_ENGINE {
   }
 
 
+
+  bool IsPlayerTalking() {
+    if( !player )
+      return true; // for interfaces
+
+    if( player->GetTalkingWith() ) {
+      static int index = parser->GetIndex( "ZS_TALK" );
+      if( player->state.IsInState( index ) || player->GetTalkingWith()->state.IsInState( index ) )
+        return true;
+    }
+
+    return false;
+  }
+
+
+
+  bool IsDialogTop() {
+    zCInputCallback* topCallback = zCInputCallback::inputList.GetNextInList()->GetData();
+    zCViewDialog* dialog = dynamic_cast<zCViewDialog*>(topCallback);
+    return dialog != Null && oCInformationManager::GetInformationManager().IsDone == 0;
+  }
+
+
+
+  bool IsDocumentTop() {
+    zCInputCallback* topCallback = zCInputCallback::inputList.GetNextInList()->GetData();
+    oCViewDocument* document = dynamic_cast<oCViewDocument*>(topCallback);
+    if( document != Null )
+      return true;
+
+    oCDoc* doc = dynamic_cast<oCDoc*>(topCallback);
+    if( doc != Null )
+      return true;
+
+    oCDocumentManager* docMan = dynamic_cast<oCDocumentManager*>(topCallback);
+    return docMan != Null;
+  }
+
+
+
+  bool IsMenuTop() {
+    zCInputCallback* topCallback = zCInputCallback::inputList.GetNextInList()->GetData();
+    zCMenu* menu = dynamic_cast<zCMenu*>(topCallback);
+    if( menu )
+      return true;
+
+    zCMenuItem* item = dynamic_cast<zCMenuItem*>(topCallback);
+    return item != Null;
+  }
+
+
   // ------------------------------------------------
 
   bool Cond_FightMode() {
@@ -230,45 +281,6 @@ namespace GOTHIC_ENGINE {
 
 
 
-  static bool PlayerIsTalking() {
-    if( !player )
-      return true; // for interfaces
-
-    if( player->GetTalkingWith() ) {
-      static int index = parser->GetIndex( "ZS_TALK" );
-      if( player->state.IsInState( index ) || player->GetTalkingWith()->state.IsInState( index ) )
-        return true;
-    }
-
-    return false;
-  }
-
-
-
-  bool Cond_TopCallbackIsDialog() {
-    zCInputCallback* topCallback = zCInputCallback::inputList.GetNextInList()->GetData();
-    zCViewDialog* dialog = dynamic_cast<zCViewDialog*>(topCallback);
-    return dialog != Null && oCInformationManager::GetInformationManager().IsDone == 0;
-  }
-
-
-
-  bool Cond_TopCallbackIsDocument() {
-    zCInputCallback* topCallback = zCInputCallback::inputList.GetNextInList()->GetData();
-    oCViewDocument* document = dynamic_cast<oCViewDocument*>(topCallback);
-    if( document != Null )
-      return true;
-
-    oCDoc* doc = dynamic_cast<oCDoc*>(topCallback);
-    if( doc != Null )
-      return true;
-
-    oCDocumentManager* docMan = dynamic_cast<oCDocumentManager*>(topCallback);
-    return docMan != Null;
-  }
-
-
-
   bool Cond_TopCallbackIsTradeDialog() {
 #if ENGINE <= Engine_G1A
     zCInputCallback* topCallback = zCInputCallback::inputList.GetNextInList()->GetData();
@@ -284,23 +296,10 @@ namespace GOTHIC_ENGINE {
 
 
 
-  bool Cond_TopCallbackIsMenu() {
-    zCInputCallback* topCallback = zCInputCallback::inputList.GetNextInList()->GetData();
-    zCMenu* menu = dynamic_cast<zCMenu*>(topCallback);
-    if( menu )
-      return true;
-
-    zCMenuItem* item = dynamic_cast<zCMenuItem*>(topCallback);
-    return item != Null;
-  }
-
-
-
   bool Cond_InventoryIsOpen() {
     zCInputCallback* topCallback = zCInputCallback::inputList.GetNextInList()->GetData();
+
 #if ENGINE <= Engine_G1A
-    // √овно-FIX: посреди торгового диалога вылазит сраное окошко
-    // подтверждени€, которое не детектитс€ проверкой на интерфейс.
     if( Cond_TopCallbackIsTradeDialog() )
       return true;
 #endif
@@ -309,42 +308,22 @@ namespace GOTHIC_ENGINE {
 
 
 
-  // √овно-FIX: кароче через choice диалог открываешь торговый инвентарь,
-  // закрываешь, выходишь из диалога и видишь, как в списке калбеков
-  // висит объект диалога. ‘икситс€ вот так.
-  static void FixEmptyDialog() {
-    zCInputCallback* topCallback = zCInputCallback::inputList.GetNextInList()->GetData();
-
-    zCViewDialog* dialog = dynamic_cast<zCViewDialog*>(topCallback);
-    if( dialog && dialog->IsDone )
-      zCInputCallback::inputList.Remove( dialog );
-  }
-
-
-
-
-
-
   bool Cond_InterfaceIsOpen() {
-    //FixEmptyDialog();
     zCInputCallback* topCallback = zCInputCallback::inputList.GetNextInList()->GetData();
-
 
 #if ENGINE <= Engine_G1A
-    // √овно-FIX: посреди торгового диалога вылазит сраное окошко
-    // подтверждени€, которое не детектитс€ проверкой на интерфейс.
     if( Cond_TopCallbackIsTradeDialog() )
       return true;
 #endif
     bool isInDialogState   = oCInformationManager::GetInformationManager().IsDone == 0;
     bool isOtherConditions = !Cond_InventoryIsOpen();
     bool isInterfaceActive =
-      Cond_TopCallbackIsMenu()     || 
-      Cond_TopCallbackIsDocument() ||
-      Cond_TopCallbackIsDialog()   || 
-      Cond_OnSpellBook()           || 
-      Cond_OnChooseWeapon()        || 
-      PlayerIsTalking();
+      IsDialogTop()         ||
+      IsDocumentTop()       ||
+      IsMenuTop()           ||
+      Cond_OnSpellBook()    || 
+      Cond_OnChooseWeapon() || 
+      IsPlayerTalking();
 
     return isInterfaceActive && isOtherConditions;
   }
@@ -353,7 +332,7 @@ namespace GOTHIC_ENGINE {
 
   bool Cond_InTransformation() {
     oCSpell* spell;
-    for( int spellID = 47 /*SPL_TRFSHEEP*/; spellID <= 58 /*SPL_TRFDRAGONSNAPPER*/; spellID++ ) {
+    for( int spellID = 47 /*FIRST -> SPL_TRFSHEEP*/; spellID <= 58 /*LAST -> SPL_TRFDRAGONSNAPPER*/; spellID++ ) {
       spell = player ? player->IsSpellActive( spellID ) : Null;
       if( spell )
         return true;
@@ -382,5 +361,17 @@ namespace GOTHIC_ENGINE {
 
   bool Cond_CanLockTarget() {
     return Cond_FightMode() || oCNpc::s_bTargetLocked != False;
+  }
+
+
+
+  bool Cond_G1() {
+    return Union.GetEngineVersion() <= Engine_G1A;
+  }
+
+
+
+  bool Cond_G2() {
+    return Union.GetEngineVersion() >= Engine_G2;
   }
 }

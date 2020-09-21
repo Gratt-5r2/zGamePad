@@ -47,6 +47,15 @@ namespace GOTHIC_ENGINE {
 
     player->TurnToEnemyInAttack();
 #endif
+
+
+    if( zKeyToggled( KEY_NUMPAD5 ) ) {
+      auto* poly = player->groundPoly;
+      if( poly ) {
+        poly->vertex[0]->position = poly->vertex[1]->position;
+        poly->CalcNormal();
+      }
+    }
   }
 
 

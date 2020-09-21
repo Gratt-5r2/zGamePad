@@ -290,6 +290,8 @@ namespace GOTHIC_ENGINE {
     CHECKCODE( Cond_CanQuickPotionDrink );
     CHECKCODE( Cond_VideoIsOpen );
     CHECKCODE( Cond_CanLockTarget );
+    CHECKCODE( Cond_G1 );
+    CHECKCODE( Cond_G2 );
 #undef CHECKCODE
     return Null;
   }
