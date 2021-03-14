@@ -130,6 +130,9 @@ namespace Gothic_II_Classic {
     #include "zCOption.inl"
   };
 
+  extern zCOption*& zoptions;
+  extern zCOption*& zgameoptions;
+
 } // namespace Gothic_II_Classic
 
 #endif // __ZOPTION_H__VER2__

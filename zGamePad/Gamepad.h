@@ -2,6 +2,11 @@
 // Union HEADER file
 
 namespace GOTHIC_ENGINE {
+#define STICK_MAX   32768
+#define STICK_MAX_D 32768.0
+#define STICK_MAX_F 32768.0f
+#define DEADZONE_R 10000.0f
+
   typedef int JOYKEY, DXKEY;
   typedef bool( *LPCONDFUNC )();
 
@@ -27,6 +32,7 @@ namespace GOTHIC_ENGINE {
     void CheckDisable( JOYKEY& keys );
     void Disable();
     bool CheckEnable( JOYKEY& keys );
+    bool HasToggledKeys();
     bool CheckCondition();
     bool CheckKeyStateCondition();
     void Enable();
@@ -94,6 +100,9 @@ namespace GOTHIC_ENGINE {
   struct zTStickState {
     int X;
     int Y;
+    int Length() {
+      return (int)sqrt( double(X * X + Y * Y) );
+    }
   };
 
 
@@ -101,12 +110,14 @@ namespace GOTHIC_ENGINE {
 
   class zCXInputDevice {
     friend class zCInput_Win32;
+    friend class zCGamepadSpellBook;
 
     JOYKEY KeyStates;
     zTStickState LeftStick;
     zTStickState RightStick;
     int LeftTrigger;
     int RightTrigger;
+    bool DeviceConnected;
 
     void InitCombinations();
     void UpdateVibration();
@@ -121,6 +132,7 @@ namespace GOTHIC_ENGINE {
     void ParseControlsEmulation( zTCombination& combination, string row );
     void ParseControlsEndRecord( zTCombination& combination );
     void ParseControlsCondition( zTCombination& combination, string row );
+    void ParseDescriptionsFile( string fileName );
     Array<zTCombination> KeyCombinations;
     zTVibrationMessage VibrationMessage;
   public:
@@ -133,6 +145,12 @@ namespace GOTHIC_ENGINE {
     void UpdateControls();
     void UpdateGamePad();
     void StartVibration( string ptr );
+    uint GetBatteryLevel();
+    bool IsBatteryLow();
+    bool IsConnected();
+    bool HasToggledKeys( JOYKEY& keys );
+    void GetStickStatesSquare( zTStickState& stateLeft, zTStickState& stateRight );
+    void GetStickStatesCircle( zTStickState& stateLeft, zTStickState& stateRight );
   };
 
   zCXInputDevice XInputDevice;
@@ -165,6 +183,7 @@ namespace GOTHIC_ENGINE {
   bool Cond_OnSpellBook();
   bool Cond_InventoryIsOpen();
   bool Cond_InterfaceIsOpen();
+  bool Cond_IsOverlayTop();
   bool Cond_InTransformation();
   bool Cond_CanQuickPotionDrink();
   bool Cond_VideoIsOpen();
@@ -181,4 +200,114 @@ namespace GOTHIC_ENGINE {
 #define ALLOWCONDITION            , 0); _comb.AddAllowFunctions(
 #define DENYCONDITION             , 0); _comb.AddDenyFunctions(
 #define KEYRECORD_END             , 0); KeyCombinations.InsertSorted( _comb ); }
+
+
+
+
+  static float GetScaleMultiplier() {
+    float scale = 1.0f;
+    Union.GetSysPackOption().Read( scale, "INTERFACE", "Scale" );
+    return scale;
+  }
+
+  static float GetStickSensitivity() {
+    float scale = 1.0f;
+    Union.GetSysPackOption().Read( scale, "ZGAMEPAD", "StickSensitivity", scale );
+    return scale;
+  }
+
+  static float CalculateInterfaceScale() {
+    static float scale = GetScaleMultiplier();
+
+    if( scale == 0 )
+      return 1.0f;
+
+    if( scale != 1 )
+      return scale;
+
+    int ydim = zrenderer->vid_ydim;
+    if( ydim < 2048 )
+      return 1.0f;
+
+    return (float)ydim / 1080.0f;
+  }
+
+
+
+
+
+
+
+  // XInput 1.3 - 1.4 compatible code
+  struct XINPUT_BATTERY_INFORMATION {
+    BYTE BatteryType;
+    BYTE BatteryLevel;
+  };
+
+  typedef DWORD( WINAPI* LPXINPUTGETSTATE ) (DWORD, XINPUT_STATE*);
+  typedef DWORD( WINAPI* LPXINPUTSETSTATE ) (DWORD, XINPUT_VIBRATION*);
+  typedef DWORD( WINAPI* LPXINPUTGETBATTERYINFORMATION )(DWORD, BYTE, XINPUT_BATTERY_INFORMATION*);
+
+#define BATTERY_DEVTYPE_GAMEPAD    0x00
+#define BATTERY_DEVTYPE_HEADSET    0x01
+#define BATTERY_LEVEL_EMPTY        0x00
+#define BATTERY_LEVEL_LOW          0x01
+#define BATTERY_LEVEL_MEDIUM       0x02
+#define BATTERY_LEVEL_FULL         0x03
+#define BATTERY_LEVEL_FAKE         0x04
+
+  static DWORD WINAPI XInputgetBatteryInformation_Fake( DWORD device, BYTE flags, XINPUT_BATTERY_INFORMATION* info ) {
+    info->BatteryLevel = BATTERY_LEVEL_FAKE;
+    return ERROR_SUCCESS;
+  }
+
+
+  LPXINPUTGETSTATE XINPUTGETSTATE = &XInputGetState;
+  LPXINPUTSETSTATE XINPUTSETSTATE = &XInputSetState;
+  LPXINPUTGETBATTERYINFORMATION XINPUTGETBATTERYINFORMATION = &XInputgetBatteryInformation_Fake;
+
+
+  static HMODULE LoadHighestXInput() {
+    HMODULE XInput = LoadLibrary( "XInput1_4.dll" );
+    if( !XInput ) {
+      XInput = LoadLibrary( "XInput1_3.dll" );
+    }
+
+    return XInput;
+  }
+
+  static void InitializeCompatibleXInput() {
+    HMODULE XInput = LoadHighestXInput();
+
+    if( XInput ) {
+      XINPUTGETSTATE = (LPXINPUTGETSTATE)GetProcAddress( XInput, "XInputGetState" );
+      XINPUTSETSTATE = (LPXINPUTSETSTATE)GetProcAddress( XInput, "XInputSetState" );
+      XINPUTGETBATTERYINFORMATION = (LPXINPUTGETBATTERYINFORMATION)GetProcAddress( XInput, "XInputGetBatteryInformation" );
+    }
+  }
+
+
+
+  struct zTMouseState {
+    int xpos;
+    int ypos;
+    int zpos;
+    int buttonPressedLeft;
+    int buttonPressedMid;
+    int buttonPressedRight;
+  };
+
+  static zTMouseState& GetWrapperMouseState() {
+    HMODULE zMouseFix = GetModuleHandle( "zMouseFix.dll" );
+    if( zMouseFix != Null ) {
+      zTMouseState* mouseState = (zTMouseState*)GetProcAddress( zMouseFix, "wrapperMouseState" );
+      if( mouseState != Null )
+        return *mouseState;
+    }
+
+    // Default gothic mouse state
+    return *(zTMouseState*)ZenDef( 0x0086CCAC, 0x008B27A8, 0x008C3004, 0x008D165C );
+  }
+
+  static zTMouseState& wrapperMouseState = GetWrapperMouseState();
 }

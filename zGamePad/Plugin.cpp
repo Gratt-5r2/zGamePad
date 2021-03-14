@@ -22,40 +22,29 @@ namespace GOTHIC_ENGINE {
     return "...";
   }
 
+
+  // DELETE ME
+  void ShowStickPosition() {
+    static zCView* stick = Null;
+    if( !stick ) {
+      // PS_RS.TGA
+      stick = new zCView();
+      screen->InsertItem( stick );
+      stick->InsertBack( "PS_RS.TGA" );
+      stick->SetSize( zPixelX( 100 ), zPixelY( 100 ) );
+    }
+
+    static zTStickState stickStateLeft, stickStateRight;
+    XInputDevice.GetStickStatesCircle( stickStateLeft, stickStateRight );
+    // XInputDevice.GetStickStatesSquare( stickStateLeft, stickStateRight );
+    zVEC2 vector = zVEC2( stickStateLeft.X, stickStateLeft.Y );
+    stick->SetPos( 4192 + zPixelX( stickStateLeft.X / 100 ), 4192 + zPixelY( stickStateLeft.Y / -100 ) );
+  }
+
+
   void Game_Loop() {
-    static bool InterfaceInitialized_GetMousePos = false;
-    if( !InterfaceInitialized_GetMousePos ) {
-      uint address = ZenDef( 0x004C8BD0, 0x004D8CF0, 0x004D3170, 0x004D5730 );
-      Hook_GetMousePos.Attach( address, &zCInput_Win32::GetMousePos_Union );
-      InterfaceInitialized_GetMousePos = true;
-#if ENGINE >= Engine_G2
-      // oCGame::s_bUsePotionKeys = True;
-#endif
-    }
-
-    DrawTarget();
-
-    if( zKeyToggled( KEY_F14 ) )
-      GetNextLeftEnemy();
-
-    if( zKeyToggled( KEY_F15 ) )
-      GetNextRightEnemy();
-
-#if ENGINE <= Engine_G1A
-    if( zKeyToggled( KEY_F13 ) && player->GetFocusNpc() )
-      oCNpc::s_bTargetLocked = !oCNpc::s_bTargetLocked;
-
-    player->TurnToEnemyInAttack();
-#endif
-
-
-    if( zKeyToggled( KEY_NUMPAD5 ) ) {
-      auto* poly = player->groundPoly;
-      if( poly ) {
-        poly->vertex[0]->position = poly->vertex[1]->position;
-        poly->CalcNormal();
-      }
-    }
+    FocusNpcLoop();
+    OverlaysLoop();
   }
 
 
@@ -67,13 +56,36 @@ namespace GOTHIC_ENGINE {
   }
 
   void Game_SaveEnd() {
+    zSTRING savePath = ogame->CreateSavePath( "GAMEPAD_QUICKBAR.SAV" );
+    zCArchiver* archiver = zarcFactory->CreateArchiverWrite( savePath, zARC_MODE_ASCII, 0, 0 );
+    if( !archiver )
+      return;
+
+    zCGamepadQuickBar_Items::GetInstance()->Archive( *archiver );
+    archiver->Close();
+    archiver->Release();
   }
 
   void LoadBegin() {
+    static bool getMousePos_Commited = false;
+    if( !getMousePos_Commited ) {
+      Hook_GetMousePos.Commit();
+      getMousePos_Commited = true;
+    }
   }
 
 
   void LoadEnd() {
+    zSTRING savePath = ogame->CreateSavePath( "GAMEPAD_QUICKBAR.SAV" );
+    zCArchiver* archiver = zarcFactory->CreateArchiverRead( savePath, 0 );
+    if( !archiver ) {
+      zCGamepadQuickBar_Items::GetInstance()->ResetAll();
+      return;
+    }
+
+    zCGamepadQuickBar_Items::GetInstance()->Unarchive( *archiver );
+    archiver->Close();
+    archiver->Release();
   }
 
   void Game_LoadBegin_NewGame() {

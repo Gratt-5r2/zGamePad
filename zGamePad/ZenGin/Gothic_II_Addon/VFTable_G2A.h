@@ -1,5 +1,6 @@
 // Supported with union (c) 2018 Union team
 
+#ifdef __G2A
 #ifndef __VFTABLE_STRUCTS_H__VER3__
 #define __VFTABLE_STRUCTS_H__VER3__
 
@@ -14939,3 +14940,4 @@ namespace Gothic_II_Addon {
 
 #undef MemUnlock
 #endif // __VFTABLE_STRUCTS_H__VER3__
+#endif // __G2A

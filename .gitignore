@@ -346,3 +346,4 @@ healthchecksdb
 /zGamePad/G2A Debug
 /zGamePad/MP Release
 *.txt
+/zGamePad/G2A Release

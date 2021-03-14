@@ -286,6 +286,7 @@ namespace GOTHIC_ENGINE {
     CHECKCODE( Cond_OnSpellBook );
     CHECKCODE( Cond_InventoryIsOpen );
     CHECKCODE( Cond_InterfaceIsOpen );
+    CHECKCODE( Cond_IsOverlayTop );
     CHECKCODE( Cond_InTransformation );
     CHECKCODE( Cond_CanQuickPotionDrink );
     CHECKCODE( Cond_VideoIsOpen );

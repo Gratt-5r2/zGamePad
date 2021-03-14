@@ -4,4 +4,4 @@
 // Add your methods here
 
 void WeaponChoose_Union();
-int Pressed_Union( int );
+int IsOnFightAni();

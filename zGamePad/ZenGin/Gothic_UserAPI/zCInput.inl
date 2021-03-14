@@ -4,3 +4,4 @@
 // Add your methods here
 
 float GetState_Union( unsigned short );
+void GetMousePos_Union( float&, float&, float& );

@@ -226,6 +226,15 @@
     <Filter Include="Plugin\Workspace\Gamepad\Helpers">
       <UniqueIdentifier>{02095c19-3436-4848-afdd-3d8eefdbbf9a}</UniqueIdentifier>
     </Filter>
+    <Filter Include="Plugin\Workspace\Gamepad\Overlays">
+      <UniqueIdentifier>{a4041785-78dd-4f71-9905-b9292a326872}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Plugin\Workspace\Gamepad\Overlays\QuickBar">
+      <UniqueIdentifier>{f657a0c1-9290-45ef-9590-9de0025cf858}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Plugin\Workspace\Gamepad\Overlays\QuickMenu">
+      <UniqueIdentifier>{1d283ee8-2c79-4afb-bb26-4db4d8469c7c}</UniqueIdentifier>
+    </Filter>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="Interface.cpp">
@@ -2815,6 +2824,24 @@
     </ClInclude>
     <ClInclude Include="SaveMenu.cpp">
       <Filter>Plugin\Workspace\Gamepad\Helpers</Filter>
+    </ClInclude>
+    <ClInclude Include="Overlays\QuickBar\QuickBar.h">
+      <Filter>Plugin\Workspace\Gamepad\Overlays\QuickBar</Filter>
+    </ClInclude>
+    <ClInclude Include="Overlays\QuickBar\QuickBar.cpp">
+      <Filter>Plugin\Workspace\Gamepad\Overlays\QuickBar</Filter>
+    </ClInclude>
+    <ClInclude Include="Overlays\GamepadOverlay.h">
+      <Filter>Plugin\Workspace\Gamepad\Overlays</Filter>
+    </ClInclude>
+    <ClInclude Include="Overlays\GamepadOverlay.cpp">
+      <Filter>Plugin\Workspace\Gamepad\Overlays</Filter>
+    </ClInclude>
+    <ClInclude Include="Overlays\QuickMenu\QuickMenu.h">
+      <Filter>Plugin\Workspace\Gamepad\Overlays\QuickMenu</Filter>
+    </ClInclude>
+    <ClInclude Include="Overlays\QuickMenu\QuickMenu.cpp">
+      <Filter>Plugin\Workspace\Gamepad\Overlays\QuickMenu</Filter>
     </ClInclude>
   </ItemGroup>
   <ItemGroup>

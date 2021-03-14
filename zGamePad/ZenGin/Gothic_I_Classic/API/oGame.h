@@ -207,6 +207,18 @@ namespace Gothic_I_Classic {
     virtual void NpcInit( zCTree<zCVob>* )                                       zCall( 0x00636C20 );
     virtual void SetAsPlayer( zSTRING const& )                                   zCall( 0x00639840 );
 
+    static string GetSaveSlotNameByID( int ID ) {
+      if( ID >  0 ) return "savegame" + A ID;
+      if( ID == 0 ) return "quicksave";
+                    return "current";
+    }
+
+    static zSTRING CreateSavePath( const zSTRING& archiveName ) {
+      string saveDir = zoptions->GetDirString( zTOptionPaths::DIR_SAVEGAMES );
+      string slotDir = GetSaveSlotNameByID( SaveLoadGameInfo.slotID );
+      return string::Combine( "%s%s\\%z", saveDir, slotDir, archiveName );
+    }
+
     // user API
     #include "oCGame.inl"
   };

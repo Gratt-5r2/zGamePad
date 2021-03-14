@@ -131,6 +131,9 @@ namespace Gothic_I_Addon {
     #include "zCOption.inl"
   };
 
+  extern zCOption*& zoptions;
+  extern zCOption*& zgameoptions;
+
 } // namespace Gothic_I_Addon
 
 #endif // __ZOPTION_H__VER1__

@@ -1263,7 +1263,6 @@ namespace Gothic_II_Classic {
     int CanJumpBack( int )                                                                       zCall( 0x0079F3F0 );
     void SetWalkStopChasm( int )                                                                 zCall( 0x0079F590 );
     int GetWalkStopChasm()                                                                       zCall( 0x0079F5D0 );
-    int IsDead()                                                                                 zInit( return attribute[NPC_ATR_HITPOINTS] <= 0; );
     static zSTRING GetInstanceByID( int )                                                        zCall( 0x006E6EA0 );
     static int GetIDByInstance( zSTRING const& )                                                 zCall( 0x006E6F00 );
     static void CreateSoundPerception( int, zCVob*, zVEC3 const&, zCVob*, int )                  zCall( 0x006FCC00 );

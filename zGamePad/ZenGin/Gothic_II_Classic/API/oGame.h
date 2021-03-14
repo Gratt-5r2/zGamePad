@@ -214,6 +214,18 @@ namespace Gothic_II_Classic {
     static int& s_bUsePotionKeys;
     static int& s_bUseQuickSave;
 
+    static string GetSaveSlotNameByID( int ID ) {
+      if( ID >  0 ) return "savegame" + A ID;
+      if( ID == 0 ) return "quicksave";
+                    return "current";
+    }
+
+    static zSTRING CreateSavePath( const zSTRING& archiveName ) {
+      string saveDir = zoptions->GetDirString( zTOptionPaths::DIR_SAVEGAMES );
+      string slotDir = GetSaveSlotNameByID( SaveLoadGameInfo.slotID );
+      return string::Combine( "%s%s\\%z", saveDir, slotDir, archiveName );
+    }
+
     // user API
     #include "oCGame.inl"
   };

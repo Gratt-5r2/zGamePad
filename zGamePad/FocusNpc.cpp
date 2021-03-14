@@ -13,6 +13,23 @@ namespace GOTHIC_ENGINE {
 
 
 
+  //
+  bool_t CheckCollision( zCVob* vob1, zCVob* vob2 ) {
+    if( !vob1 || !vob2 )
+      return False;
+
+    oCWorld* world = ogame->GetGameWorld();
+    zVEC3    rayStart1 = vob1->GetPositionWorld();
+    zVEC3    rayStart2 = ogame->GetCameraVob()->GetPositionWorld();
+    zVEC3    rayEnd = vob2->GetPositionWorld();
+    bool_t   hasCollision = world->TraceRayFirstHit( rayStart1, rayEnd - rayStart1, vob1, zTRACERAY_STAT_POLY | zTRACERAY_POLY_IGNORE_TRANSP ) ||
+      world->TraceRayFirstHit( rayStart2, rayEnd - rayStart2, vob1, zTRACERAY_STAT_POLY | zTRACERAY_POLY_IGNORE_TRANSP );
+
+    return hasCollision;
+  }
+
+
+
   // Turn killer to enemy
   void SetHeadingToEnemy( oCNpc* killer, oCNpc* enemy ) {
     killer->RotateLocalY( GetAngleBetweenNpcs( killer, enemy ) * DEGREE );
@@ -76,7 +93,7 @@ namespace GOTHIC_ENGINE {
   Array<oCNpc*> oCNpc::GetNearestFightNpcList() {
     zCArray<zCVob*> vobList;
     Array<oCNpc*>   npcList;
-    CreateVobList( vobList, oCNpcFocus::focus->GetMaxRange() );
+    CreateVobList( vobList, oCNpcFocus::focus->GetMaxRange() * 1.5f );
 
     for( int i = 0; i < vobList.GetNum(); i++ ) {
       oCNpc* npc = vobList[i]->CastTo<oCNpc>();
@@ -89,6 +106,18 @@ namespace GOTHIC_ENGINE {
   }
 
 
+  //
+  Array<oCNpc*> oCNpc::GetNearestVisibleFightNpcList() {
+    Array<oCNpc*> npcs = GetNearestFightNpcList();
+    Array<oCNpc*> npcsVisible;
+    for( uint i = 0; i < npcs.GetNum(); i++ )
+      if( !CheckCollision( player, npcs[i] ) )
+        npcsVisible += npcs[i];
+    
+    return npcsVisible;
+  }
+
+
 
   // Check focus npc
   void CheckDeadTarget() {
@@ -97,6 +126,61 @@ namespace GOTHIC_ENGINE {
       if( oCNpc::s_bTargetLocked )
         if( !GetNextEnemy() )
           oCNpc::s_bTargetLocked = False;
+  }
+
+
+
+  void CheckTargetDistance() {
+    static uint loseTimer = 0;
+    if( !oCNpc::s_bTargetLocked ) {
+      if( loseTimer )
+        loseTimer = 0;
+
+      return;
+    }
+
+    oCNpc* targetNpc = player->GetFocusNpc();
+
+    if( targetNpc ) {
+      float maxRange = oCNpcFocus::focus->GetMaxRange() * 2.0f;
+      if( targetNpc->GetDistanceToVob( *player ) > maxRange ) {
+        if( loseTimer == 0 )
+          loseTimer = Timer::GetTime();
+
+        else if( Timer::GetTime() - loseTimer >= 3000 )
+          if( !GetNextEnemy() )
+            oCNpc::s_bTargetLocked = False;
+      }
+      else if( loseTimer > 0 )
+        loseTimer = 0;
+    }
+  }
+
+
+
+  // 
+  void CheckInvisibleTarget() {
+    static uint loseTimer = 0;
+    if( !oCNpc::s_bTargetLocked ) {
+      if( loseTimer )
+        loseTimer = 0;
+
+      return;
+    }
+
+    oCNpc* targetNpc = player->GetFocusNpc();
+    if( targetNpc ) {
+      if( CheckCollision( player, targetNpc ) ) {
+        if( loseTimer == 0 )
+          loseTimer = Timer::GetTime();
+
+        else if( Timer::GetTime() - loseTimer >= 3000 )
+          if( !GetNextEnemy() )
+            oCNpc::s_bTargetLocked = False;
+      }
+      else if( loseTimer > 0 )
+        loseTimer = 0;
+    }
   }
 
 
@@ -116,14 +200,13 @@ namespace GOTHIC_ENGINE {
     if( !target ) {
       target = new zCView();
       target->InsertBack( "Gp_Target" );
-
-      bool scaleEnabled;
-      Union.GetSysPackOption().Read( scaleEnabled, "INTERFACE", "Scale" );
-      size = scaleEnabled ? 128 : 64;
+      size = GetScaleMultiplier() == 1 ? 128 : 64;
     }
 
     // Next target after dead current
     CheckDeadTarget();
+    CheckTargetDistance();
+    CheckInvisibleTarget();
 
     if( oCNpc::s_bTargetLocked ) {
       zVEC3 position = targetNpc->GetPositionWorld();
@@ -146,7 +229,7 @@ namespace GOTHIC_ENGINE {
 
   // 
   oCNpc* oCNpc::GetNearestFightNpcRight_Union() {
-    Array<oCNpc*> npcList = GetNearestFightNpcList();
+    Array<oCNpc*> npcList = GetNearestVisibleFightNpcList();
 
     oCNpc* nearestNpc  = Null;
     float nearestAngle = RAD360;
@@ -166,7 +249,7 @@ namespace GOTHIC_ENGINE {
 
   // 
   oCNpc* oCNpc::GetNearestFightNpcLeft_Union() {
-    Array<oCNpc*> npcList = GetNearestFightNpcList();
+    Array<oCNpc*> npcList = GetNearestVisibleFightNpcList();
 
     oCNpc* nearestNpc  = Null;
     float nearestAngle = RAD360;
@@ -186,7 +269,7 @@ namespace GOTHIC_ENGINE {
 
   // 
   oCNpc* oCNpc::GetNearestFightNpc_Union() {
-    Array<oCNpc*> npcList = GetNearestFightNpcList();
+    Array<oCNpc*> npcList = GetNearestVisibleFightNpcList();
 
     oCNpc* nearestNpc  = Null;
     float nearestAngle = RAD360;
@@ -223,6 +306,7 @@ namespace GOTHIC_ENGINE {
 
     THISCALL( Hook_oCNpc_CollectFocusVob )();
   }
+#endif
 
 
 
@@ -238,5 +322,24 @@ namespace GOTHIC_ENGINE {
     if( isFightAni && focus_vob )
       Turn( focus_vob->GetPositionWorld() );
   }
+
+
+
+  static void FocusNpcLoop() {
+    DrawTarget();
+
+    if( zKeyToggled( KEY_F14 ) )
+      GetNextLeftEnemy();
+
+    if( zKeyToggled( KEY_F15 ) )
+      GetNextRightEnemy();
+
+#if ENGINE <= Engine_G2A
+    if( zKeyToggled( KEY_F13 ) )
+      if( player->GetFocusNpc() || GetNextEnemy() )
+        oCNpc::s_bTargetLocked = !oCNpc::s_bTargetLocked;
+
+    player->TurnToEnemyInAttack();
 #endif
+  }
 }

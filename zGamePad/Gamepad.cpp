@@ -5,7 +5,6 @@ namespace GOTHIC_ENGINE {
   bool*         keyevent  =  (bool*)        ZenDef( 0x0086CCC8, 0x008B27C0, 0x008C3020, 0x008D1678 );
   bool*         keytoggle =  (bool*)        ZenDef( 0x0086CED0, 0x008B29D4, 0x008C3260, 0x008D18B8 );
   zCArray<int>& keybuffer = *(zCArray<int>*)ZenDef( 0x0086D2DC, 0x008B2E00, 0x008C36F0, 0x008D1D50 );
-  float         DeadZoneR = 10000.0f;
 
 
 
@@ -161,10 +160,22 @@ namespace GOTHIC_ENGINE {
 
       return;
     }
+    else if( HasToggledKeys() )
+      return;
 
     Enabled = true;
     Toggled = true;
     SetEmulationState( True );
+  }
+
+
+
+  bool zTCombination::HasToggledKeys() {
+    JOYKEY joyKeys = 0;
+    for( uint i = 0; i < Combination.GetNum(); i++ )
+      joyKeys |= Combination[i];
+
+    return XInputDevice.HasToggledKeys( joyKeys );
   }
 
 
@@ -303,6 +314,7 @@ namespace GOTHIC_ENGINE {
 
 
   void zCXInputDevice::InitDevice() {
+    InitializeCompatibleXInput();
     Gamepad = XINPUT_STATE();
     Capabilities = PXINPUT_CAPABILITIES();
     ZeroMemory( &Gamepad, sizeof( XINPUT_STATE ) );
@@ -316,7 +328,7 @@ namespace GOTHIC_ENGINE {
     KeyCombinations.Clear();
     InitCombinations();
 
-    XInputGetState( 0, &Gamepad );
+    XINPUTGETSTATE( 0, &Gamepad );
     for( uint i = 0; i < KeyCombinations.GetNum(); i++ )
       KeyCombinations[i].KeyStates = Gamepad.Gamepad.wButtons;
   }
@@ -335,13 +347,13 @@ namespace GOTHIC_ENGINE {
         VibrationMessage.Index     = Invalid;
         Vibration.wLeftMotorSpeed  = 0;
         Vibration.wRightMotorSpeed = 0;
-        XInputSetState( 0, &Vibration );
-        return;
+      }
+      else {
+        Vibration.wLeftMotorSpeed  = strength.ToInt32(); // big motor
+        Vibration.wRightMotorSpeed = 0;                  // small motor
       }
 
-      Vibration.wLeftMotorSpeed  = strength.ToInt32(); // Low-speed motor
-      Vibration.wRightMotorSpeed = 0;                  // Hight-speed motor
-      XInputSetState( 0, &Vibration );
+      XINPUTSETSTATE( 0, &Vibration );
     }
   }
 
@@ -420,11 +432,11 @@ namespace GOTHIC_ENGINE {
     int leftStick  = (diveMode ? Gamepad.Gamepad.sThumbLX : Gamepad.Gamepad.sThumbRX);
     int rightStick = (diveMode ? Gamepad.Gamepad.sThumbLY : Gamepad.Gamepad.sThumbRY);
 
-    RightStick.X = abs( leftStick  ) > DeadZoneR ? leftStick  : 0;
-    RightStick.Y = abs( rightStick ) > DeadZoneR ? rightStick : 0;
+    RightStick.X = abs( leftStick  ) > DEADZONE_R ? leftStick  : 0;
+    RightStick.Y = abs( rightStick ) > DEADZONE_R ? rightStick : 0;
 
-    if( RightStick.X ) RightStick.X += leftStick  > 0 ? (int)-DeadZoneR : (int)+DeadZoneR;
-    if( RightStick.Y ) RightStick.Y += rightStick > 0 ? (int)-DeadZoneR : (int)+DeadZoneR;
+    if( RightStick.X ) RightStick.X += leftStick  > 0 ? (int)-DEADZONE_R : (int)+DEADZONE_R;
+    if( RightStick.Y ) RightStick.Y += rightStick > 0 ? (int)-DEADZONE_R : (int)+DEADZONE_R;
   }
 
 
@@ -460,10 +472,57 @@ namespace GOTHIC_ENGINE {
 
 
 
+#if 0
+  bool ToggleGamepadMenu() {
+    if( ogame->IsOnPause() )
+      return false;
+
+    zTGamepadMenu::GetInstance().Show();
+    return true;
+  }
+
+
+
+  void PrepareGamepadMenu( WORD& keyStates ) {
+    static uint keyStartTimeBegin  = 0;
+    static bool gamepadMenuToggled = false;
+           bool keyStartPressed    = (keyStates & ButtonStart) == ButtonStart;
+
+    if( keyStartPressed ) {
+      keyStates ^= ButtonStart;
+
+      if( !gamepadMenuToggled ) {
+        if( keyStartTimeBegin ) {
+          if( Timer::GetTime() - keyStartTimeBegin >= 1000 && ToggleGamepadMenu() )
+            gamepadMenuToggled = true;
+        }
+        else
+          keyStartTimeBegin = Timer::GetTime();
+      }
+    }
+    else {
+      if( !gamepadMenuToggled && keyStartTimeBegin )
+        keyStates |= ButtonStart;
+      
+      keyStartTimeBegin  = 0;
+      gamepadMenuToggled = false;
+    }
+  }
+#endif
+
+
+
   void zCXInputDevice::UpdateKeyState() {
     static int gamepadID = GetGamepadID();
 
-    XInputGetState( gamepadID, &Gamepad );
+    if( XINPUTGETSTATE( gamepadID, &Gamepad ) == ERROR_DEVICE_NOT_CONNECTED ) {
+      DeviceConnected = false;
+      return;
+    }
+    else if( !DeviceConnected )
+      DeviceConnected = true;
+
+    // PrepareGamepadMenu( Gamepad.Gamepad.wButtons ); // DELETE ME
     KeyStates = Gamepad.Gamepad.wButtons;
     UpdateSticksState();
 
@@ -478,8 +537,6 @@ namespace GOTHIC_ENGINE {
         KeyCombinations[i].CheckEnable( KeyStates );
 
     UpdateLastKeyState();
-
-
 
     if( player ) {
       static Timer helper;
@@ -514,5 +571,66 @@ namespace GOTHIC_ENGINE {
     VibrationMessage.Index = 0;
     VibrationMessage.Pattern = ptr;
     VibrationMessage.Timer[0u];
+  }
+
+
+
+  uint zCXInputDevice::GetBatteryLevel() {
+    XINPUT_BATTERY_INFORMATION batteryInformation;
+    if( !XINPUTGETBATTERYINFORMATION( GetGamepadID(), BATTERY_DEVTYPE_GAMEPAD, &batteryInformation ) != ERROR_SUCCESS )
+      /*return BATTERY_LEVEL_FAKE*/;
+
+    return batteryInformation.BatteryLevel;
+  }
+
+
+
+  bool zCXInputDevice::IsBatteryLow() {
+    return GetBatteryLevel() <= BATTERY_LEVEL_LOW;
+  }
+
+
+
+  bool zCXInputDevice::IsConnected() {
+    return DeviceConnected;
+  }
+
+
+
+  bool zCXInputDevice::HasToggledKeys( JOYKEY& keys ) {
+    for( uint i = 0; i < KeyCombinations.GetNum(); i++ ) {
+
+      auto& combo = KeyCombinations[i];
+      if( combo.ToggleMode && combo.Enabled ) {
+
+        auto& comboKeys = combo.Combination;
+        for( uint j = 0; j < comboKeys.GetNum(); j++ )
+          if( (keys & comboKeys[j]) != 0 )
+            return true;
+      }
+    }
+
+    return false;
+  }
+
+
+
+  void zCXInputDevice::GetStickStatesSquare( zTStickState& stateLeft, zTStickState& stateRight ) {
+    stateLeft = LeftStick;
+    stateRight = RightStick;
+  }
+
+
+
+  void zCXInputDevice::GetStickStatesCircle( zTStickState& stateLeft, zTStickState& stateRight ) {
+    double squareX = double( LeftStick.X ) / STICK_MAX_D;
+    double squareY = double( LeftStick.Y ) / STICK_MAX_D;
+    stateLeft.X = int( squareX * sqrt( 1.0 - pow( squareY, 2 ) * 0.5 ) * STICK_MAX_D );
+    stateLeft.Y = int( squareY * sqrt( 1.0 - pow( squareX, 2 ) * 0.5 ) * STICK_MAX_D );
+
+    squareX = double( RightStick.X ) / STICK_MAX_D;
+    squareY = double( RightStick.Y ) / STICK_MAX_D;
+    stateRight.X = int( squareX * sqrt( 1.0 - pow( squareY, 2 ) * 0.5 ) * STICK_MAX_D );
+    stateRight.Y = int( squareY * sqrt( 1.0 - pow( squareX, 2 ) * 0.5 ) * STICK_MAX_D );
   }
 }

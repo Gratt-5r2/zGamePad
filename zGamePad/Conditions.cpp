@@ -171,6 +171,14 @@ namespace GOTHIC_ENGINE {
 
 
 
+  bool Cond_IsOverlayTop() {
+    zCInputCallback* topCallback = zCInputCallback::inputList.GetNextInList()->GetData();
+    zCGamepadOverlay* overlay = dynamic_cast<zCGamepadOverlay*>(topCallback);
+    return overlay != Null;
+  }
+
+
+
   bool IsDocumentTop() {
     zCInputCallback* topCallback = zCInputCallback::inputList.GetNextInList()->GetData();
     oCViewDocument* document = dynamic_cast<oCViewDocument*>(topCallback);
@@ -319,6 +327,7 @@ namespace GOTHIC_ENGINE {
     bool isOtherConditions = !Cond_InventoryIsOpen();
     bool isInterfaceActive =
       IsDialogTop()         ||
+      Cond_IsOverlayTop()   ||
       IsDocumentTop()       ||
       IsMenuTop()           ||
       Cond_OnSpellBook()    || 
@@ -331,6 +340,12 @@ namespace GOTHIC_ENGINE {
 
 
   bool Cond_InTransformation() {
+    if( !player )
+      return false;
+
+    return !player->IsHuman();
+
+#if 0
     oCSpell* spell;
     for( int spellID = 47 /*FIRST -> SPL_TRFSHEEP*/; spellID <= 58 /*LAST -> SPL_TRFDRAGONSNAPPER*/; spellID++ ) {
       spell = player ? player->IsSpellActive( spellID ) : Null;
@@ -339,6 +354,7 @@ namespace GOTHIC_ENGINE {
     }
 
     return false;
+#endif
   }
 
 

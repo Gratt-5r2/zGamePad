@@ -118,6 +118,45 @@ namespace GOTHIC_ENGINE {
   }
 
 
+  inline wstring GetCurrentLangName() {
+    TSystemLangID ID = Union.GetSystemLanguage();
+    switch( ID ) {
+      case UnionCore::Lang_Rus: return L"RUS";
+      case UnionCore::Lang_Eng: return L"ENG";
+      case UnionCore::Lang_Ger: return L"GER";
+      case UnionCore::Lang_Pol: return L"POS";
+      case UnionCore::Lang_Rou: return L"ROU";
+      case UnionCore::Lang_Ita: return L"ITA";
+      case UnionCore::Lang_Cze: return L"CZE";
+      case UnionCore::Lang_Esp: return L"ESP";
+    }
+
+    return L"ENG";
+  }
+
+
+  void zCXInputDevice::ParseDescriptionsFile( string fileName ) {
+    wstring data;
+    data.ReadFromVdf( fileName.Shrink().Upper().AToW(), VDF_DEFAULT | VDF_PHYSICALFIRST );
+    Array<wstring> descriptions = data.Split( L"Lang:" );
+
+    uint langDataIndex    = Invalid;
+    uint defaultDataIndex = 0;
+    wstring currentLangName = GetCurrentLangName();
+
+
+    for( uint i = 0; i < descriptions.GetNum(); i++ ) {
+      wstring token = descriptions[i].GetWordSmart();
+      if( token == currentLangName ) {
+        langDataIndex = i;
+        break;
+      }
+      else if( token == L"ENG" )
+        defaultDataIndex = i;
+    }
+  }
+
+
 
   bool zCXInputDevice::ParseControlFile() {
     // Check external control file
@@ -169,9 +208,10 @@ namespace GOTHIC_ENGINE {
       }
 
            // Parse commands
-           if( command == "Combination" ) ParseControlsCombination( combination, row );
-      else if( command == "Emulation" )   ParseControlsEmulation  ( combination, row );
-      else if( command == "Condition" )   ParseControlsCondition  ( combination, row );
+           if( command == "Combination" )       ParseControlsCombination( combination, row );
+      else if( command == "Emulation" )         ParseControlsEmulation  ( combination, row );
+      else if( command == "Condition" )         ParseControlsCondition  ( combination, row );
+      else if( command == "KeyDescriptions" )   ParseDescriptionsFile   ( row.GetPattern( command, "" ) );
       else
         // unknown command !!!
         Message::Fatal( "Unknown control command: " + command );

@@ -1,5 +1,6 @@
 // Supported with union (c) 2018 Union team
 
+#ifdef __G2
 #ifndef __VFTABLE_STRUCTS_H__VER2__
 #define __VFTABLE_STRUCTS_H__VER2__
 
@@ -14917,3 +14918,4 @@ namespace Gothic_II_Classic {
 
 #undef MemUnlock
 #endif // __VFTABLE_STRUCTS_H__VER2__
+#endif // __G2

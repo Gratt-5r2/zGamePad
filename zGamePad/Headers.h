@@ -5,6 +5,9 @@
 #pragma region Includes
 #include "Gamepad.h"
 #include "ControlParser.h"
+#include "Overlays/GamepadOverlay.h"
+#include "Overlays/QuickBar/QuickBar.h"
+#include "Overlays/QuickMenu/QuickMenu.h"
 #include "Plugin.h"
 #pragma endregion
 

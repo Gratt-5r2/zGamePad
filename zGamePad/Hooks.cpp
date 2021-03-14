@@ -18,13 +18,36 @@ namespace GOTHIC_ENGINE {
 
 
 
-  // HOOK Hook_GetMousePos PATCH( &zCInput_Win32::GetMousePos, &zCInput_Win32::GetMousePos_Union );
-  HOOK Hook_GetMousePos = AutoModulePatchCallInvoker( Null, &zCInput_Win32::GetMousePos_Union );
+  HOOK Hook_GetMousePos PATCH_IF( &zCInput_Win32::GetMousePos, &zCInput_Win32::GetMousePos_Union, false );
 
   void zCInput_Win32::GetMousePos_Union( float& x, float& y, float& z ) {
+    static float stickSensitivity = GetStickSensitivity();
+    static float rollbackSensitivity = 1.0f;
+    if( zCGamepadQuickBar::OverlayMouseHooksCount > 0 ) {
+      x = 0.0f;
+      y = 0.0f;
+      z = 0.0f;
+      rollbackSensitivity = -1.0f;
+      return;
+    }
+
     THISCALL( Hook_GetMousePos )(x, y, z);
-    x += ((float)XInputDevice.RightStick.X) / 3000.0f;
-    y += ((float)XInputDevice.RightStick.Y) / -3000.0f;
+    x += ((float)XInputDevice.RightStick.X) / 3000.0f * stickSensitivity;
+    y += ((float)XInputDevice.RightStick.Y) / -3000.0f * stickSensitivity;
+
+    if( rollbackSensitivity < 1.0f ) {
+      if( abs( x + y ) > 0.3f ) {
+        rollbackSensitivity += 0.5f * ztimer->frameTimeFloat / 1000.0f;
+        if( rollbackSensitivity > 1.0f )
+          rollbackSensitivity = 1.0f;
+      }
+      else
+        rollbackSensitivity = 1.0f;
+    }
+
+    float multiplier = max( rollbackSensitivity, 0.0f );
+    x *= multiplier;
+    y *= multiplier;
   }
 
 
@@ -108,30 +131,128 @@ namespace GOTHIC_ENGINE {
 
 
 
-  int oCAIHuman::Pressed_Union( int key ) {
-    if( key == GAME_ACTION )
-      if( !Pressed( GAME_UP ) && !Pressed( GAME_LEFT ) && !Pressed( GAME_RIGHT ) && !Pressed( GAME_STRAFELEFT ) && !Pressed( GAME_STRAFERIGHT ) )
-        if( IsStateAniActive( _t_hitf ) || IsStateAniActive( _t_hitl ) || IsStateAniActive( _t_hitr ) )
-          return True;
+
+  int LogicalKeyPressed( uint16 lkey ) {
+    zCArray<uint16> keys;
+    zinput->GetBinding( lkey, keys );
+    for( int i = 0; i < keys.GetNum(); i++ )
+      if( zinput->KeyPressed( keys[i] ) )
+        return True;
 
     return False;
   }
 
+#if 0
+  int oCAIHuman::Pressed_Union( int key ) {
+    if( key == GAME_ACTION ) {
+      if( !LogicalKeyPressed( GAME_UP ) )
+        if( IsStateAniActive( _t_hitf ) || IsStateAniActive( _t_hitl ) || IsStateAniActive( _t_hitr ) )
+          return True;
+    }
+
+    return False;
+
+    /*if( key == GAME_ACTION )
+      if( !Pressed( GAME_UP ) && !Pressed( GAME_LEFT ) && !Pressed( GAME_RIGHT ) && !Pressed( GAME_STRAFELEFT ) && !Pressed( GAME_STRAFERIGHT ) )
+        if( IsStateAniActive( _t_hitf ) || IsStateAniActive( _t_hitl ) || IsStateAniActive( _t_hitr ) )
+          return True;
+
+    return False;*/
+  }
+#endif
 
 
+  int oCAIHuman::IsOnFightAni() {
+    return
+      //IsStateAniActive( _t_hitf ) ||
+      IsStateAniActive( _t_hitl ) ||
+      IsStateAniActive( _t_hitr );
+  }
 
-  HOOK Hook_zCInput_Win32_GetState AS( &zCInput_Win32::GetState, &zCInput::GetState_Union );
+
+#if 1
+  HOOK Hook_zCInput_Win32_GetState PATCH( &zCInput_Win32::GetState, &zCInput::GetState_Union );
+
+  inline bool IsMovementKeyPressed() {
+    return
+      LogicalKeyPressed( GAME_UP )   ||
+      LogicalKeyPressed( GAME_DOWN ) ||
+      LogicalKeyPressed( GAME_LEFT ) ||
+      LogicalKeyPressed( GAME_RIGHT );
+  }
 
   float zCInput::GetState_Union( unsigned short key ) {
     if( key == GAME_ACTION ) {
-      if( player && player->human_ai ) {
-        if( player->human_ai->Pressed_Union( key ) )
+      if( !LogicalKeyPressed( GAME_DOWN ) )
+        if( player->human_ai->IsOnFightAni() ) {
           return True;
       }
-      //else
-      //  return True;
     }
 
     return THISCALL( Hook_zCInput_Win32_GetState )(key);
+
+#if 0
+    float OK = THISCALL( Hook_zCInput_Win32_GetState )(key);
+
+    if( key == GAME_ACTION ) {
+      if( player->human_ai->IsOnFightAni() )
+        if( !IsMovementKeyPressed() && !LogicalKeyPressed( GAME_PARADE ) )
+          return True;
+
+      /*if( LogicalKeyPressed( GAME_DOWN ) && LogicalKeyPressed( GAME_ACTION ) )
+        return True;
+
+      if( player && player->human_ai )
+        if( !IsMovementKeyPressed() && player->human_ai->IsOnFightAni() )
+          return True;*/
+    }
+
+    return OK;
+#endif
+
+    //if( key == GAME_ACTION && 0 ) {
+    //  if( player && player->human_ai ) {
+    //    if( player->human_ai->Pressed_Union( key ) )
+    //      return True;
+    //  }
+    //  //else
+    //  //  return True;
+    //}
+
+    //return THISCALL( Hook_zCInput_Win32_GetState )(key);
+  }
+#endif
+
+
+
+  HOOK Hook_oCNpcInventory_HandleEvent PATCH( &oCNpcInventory::HandleEvent, &oCNpcInventory::HandleEvent_Union );
+
+  int oCNpcInventory::HandleEvent_Union( int key ) {
+    auto itemsCircle = zCGamepadQuickBar_Items::GetInstance();
+    static bool waitingSlotID = false;
+
+    if( key == KEY_COMMA ) {
+      itemsCircle->ShowAt( screen, zEGamepadQuickBarAlignment_Center );
+      waitingSlotID = true;
+      return True;
+    }
+
+    if( waitingSlotID ) {
+      if( key == KEY_ESCAPE || key == MOUSE_BUTTONRIGHT )
+        waitingSlotID = false;
+      
+      if( key == KEY_RETURN || key == KEY_LCONTROL || key == MOUSE_BUTTONLEFT ) {
+        oCItem* item = GetSelectedItem();
+        itemsCircle->SetItemInActiveCell( item );
+        waitingSlotID = false;
+      }
+
+      if( key == KEY_DELETE )
+        itemsCircle->SetItemInActiveCell( Null );
+
+      return True;
+    }
+
+    return THISCALL( Hook_oCNpcInventory_HandleEvent )(key);
   }
 }

@@ -126,6 +126,7 @@ namespace Gothic_II_Classic {
 
     void zCMenuItem_OnInit( zSTRING const& )            zCall( 0x004DC470 );
     void zCMenuItem_OnInit()                            zCall( 0x004DC680 );
+    void AddRef()                                       { m_iRefCtr++; }
     void Release()                                      zCall( 0x0047C150 );
     zCMenuItem* GetSelItem()                            zCall( 0x004DBDD0 );
     zCMenuItem( zSTRING const& a0 )                     zInit( zCMenuItem_OnInit( a0 ));

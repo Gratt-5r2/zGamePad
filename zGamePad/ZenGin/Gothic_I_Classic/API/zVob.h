@@ -244,7 +244,7 @@ namespace Gothic_I_Classic {
     void __fastcall UnarchivePacked( zCArchiver&, int )                                                zCall( 0x005D3F90 );
     void __fastcall UnarchiveVerbose( zCArchiver& )                                                    zCall( 0x005D43E0 );
     void SetVobName( zSTRING const& )                                                                  zCall( 0x005D4970 );
-    zCEventManager* __fastcall GetEM( int )                                                            zCall( 0x005D49B0 );
+    zCEventManager* __fastcall GetEM( int = 0 )                                                        zCall( 0x005D49B0 );
     zCOLOR CalcLightSampleAtOrigin()                                                                   zCall( 0x005D4CD0 );
     zCOLOR GetLightColorStat()                                                                         zCall( 0x005D4D50 );
     zCOLOR GetLightColorDyn()                                                                          zCall( 0x005D4FE0 );
