@@ -2,6 +2,95 @@
 // Union SOURCE file
 
 namespace GOTHIC_ENGINE {
+  Array<zTHelpString> zTHelpString::HelpStrings;
+
+  zTHelpString::zTHelpString() {
+    // pass
+  }
+
+
+
+  inline TSystemLangID GetLangID( const string& lang ) {
+    if( lang == "RUS" ) return Lang_Rus;
+    if( lang == "ENG" ) return Lang_Eng;
+    if( lang == "GER" ) return Lang_Ger;
+    if( lang == "DEU" ) return Lang_Ger;
+    if( lang == "POL" ) return Lang_Pol;
+    if( lang == "ROU" ) return Lang_Rou;
+    if( lang == "ITA" ) return Lang_Ita;
+    if( lang == "CZE" ) return Lang_Cze;
+    if( lang == "ESP" ) return Lang_Esp;
+    return Lang_Eng;
+  }
+
+
+
+  void zTHelpString::SetText( const string& text, const string& lang ) {
+    TSystemLangID langID = GetLangID( lang );
+
+    for( uint i = 0; i < Items.GetNum(); i++ ) {
+      if( Items[i].LangID == langID ) {
+        Items[i].Text = text;
+        return;
+      }
+    }
+
+    auto& item  = Items.Create();
+    item.LangID = langID;
+    item.Text   = text;
+  }
+
+
+
+  string zTHelpString::GetText() {
+    TSystemLangID currentLandID = Union.GetSystemLanguage();
+    TSystemLangID alterLandID   = Lang_Eng;
+
+    for( uint i = 0; i < Items.GetNum(); i++ )
+      if( Items[i].LangID == currentLandID )
+        return Items[i].Text;
+    
+    for( uint i = 0; i < Items.GetNum(); i++ )
+      if( Items[i].LangID == alterLandID )
+        return Items[i].Text;
+
+    if( Items.GetNum() > 0 )
+      return Items.GetFirst().Text;
+
+    return "";
+  }
+
+
+
+  void zTHelpString::CreateString( const string& name, const string& text, const string& lang ) {
+    for( uint i = 0; i < HelpStrings.GetNum(); i++ ) {
+      zTHelpString& help = HelpStrings[i];
+      if( help.Name == name ) {
+        help.SetText( text, lang );
+        return;
+      }
+    }
+
+    zTHelpString& help = HelpStrings.Create();
+    help.Name = name;
+    help.SetText( text, lang );
+  }
+
+
+
+  string zTHelpString::GetString( const string& name ) {
+    for( uint i = 0; i < HelpStrings.GetNum(); i++ )
+      if( HelpStrings[i].Name == name )
+        return HelpStrings[i].GetText();
+    
+    return "???";
+  }
+
+
+
+
+
+
   COption& GetOptions() {
     COption& defaultOptions = Union.GetDefaultOption();
     COption& gameOptions = Union.GetGameOption();
@@ -69,7 +158,7 @@ namespace GOTHIC_ENGINE {
 
       // Is 'NOT' function ??
       if( token == "!" ) {
-        isNot = true;
+        isNot = !isNot;
         continue;
       }
 
@@ -77,38 +166,41 @@ namespace GOTHIC_ENGINE {
       if( token == "," )
         continue;
 
-      // Find function by name
+      // Condition by function
       LPCONDFUNC func = GetConditionFunction( token );
       if( func != Null ) {
-        if( !isNot ) combination.AddAllowFunctions( func, 0 );
-        else {
+        if( isNot ) {
           combination.AddDenyFunctions( func, 0 );
           isNot = false;
         }
+        else
+          combination.AddAllowFunctions( func, 0 );
 
         continue;
       }
 
-      // 
+      // Condition by keyboard key
       DXKEY dxKey = GetEmulationKeyCode( token );
       if( dxKey != None ) {
-        if( !isNot ) combination.AddAllowButtons( dxKey, 0 );
-        else {
+        if( isNot ) {
           combination.AddDenyButtons( dxKey, 0 );
           isNot = false;
         }
+        else
+          combination.AddAllowButtons( dxKey, 0 );
 
         continue;
       }
 
-      // 
+      // Condition by gamepad key
       JOYKEY joyKey = GetCombinationKeyCode( token );
       if( joyKey != None ) {
-        if( !isNot ) combination.AddAllowCombinations( joyKey, 0 );
-        else {
+        if( isNot ) {
           combination.AddDenyCombinations( joyKey, 0 );
           isNot = false;
         }
+        else
+          combination.AddAllowCombinations( joyKey, 0 );
 
         continue;
       }
@@ -118,42 +210,41 @@ namespace GOTHIC_ENGINE {
   }
 
 
-  inline wstring GetCurrentLangName() {
-    TSystemLangID ID = Union.GetSystemLanguage();
-    switch( ID ) {
-      case UnionCore::Lang_Rus: return L"RUS";
-      case UnionCore::Lang_Eng: return L"ENG";
-      case UnionCore::Lang_Ger: return L"GER";
-      case UnionCore::Lang_Pol: return L"POS";
-      case UnionCore::Lang_Rou: return L"ROU";
-      case UnionCore::Lang_Ita: return L"ITA";
-      case UnionCore::Lang_Cze: return L"CZE";
-      case UnionCore::Lang_Esp: return L"ESP";
-    }
 
-    return L"ENG";
+  void zCXInputDevice::ParseControlsHelp( zTCombination& combination, string row ) {
+    string text = row.GetWordSmart( 2 );
+    if( text == "\"" )
+      text = row.GetPattern( "\"", "\"" );
+    else
+      text = zTHelpString::GetString( text );
+
+    combination.Help = zTCombination_Help::Create( text, combination.Combination );
   }
 
 
-  void zCXInputDevice::ParseDescriptionsFile( string fileName ) {
-    wstring data;
-    data.ReadFromVdf( fileName.Shrink().Upper().AToW(), VDF_DEFAULT | VDF_PHYSICALFIRST );
-    Array<wstring> descriptions = data.Split( L"Lang:" );
 
-    uint langDataIndex    = Invalid;
-    uint defaultDataIndex = 0;
-    wstring currentLangName = GetCurrentLangName();
+  void zCXInputDevice::ParseControlsStringName( string& stringName, string row ) {
+    string name = row.GetWordSmart( 2 );
+    if( name.IsEmpty() )
+      Message::Fatal( "Empty string name in Gamepad file." );
+
+    stringName = name;
+  }
 
 
-    for( uint i = 0; i < descriptions.GetNum(); i++ ) {
-      wstring token = descriptions[i].GetWordSmart();
-      if( token == currentLangName ) {
-        langDataIndex = i;
-        break;
-      }
-      else if( token == L"ENG" )
-        defaultDataIndex = i;
-    }
+
+  void zCXInputDevice::ParseControlsStringText( string& stringName, string row ) {
+    if( stringName.IsEmpty() )
+      Message::Fatal( "Empty string name in Gamepad file." );
+
+    string lang = row.GetWordSmart( 1 );
+    string text = row.GetWordSmart( 2 );
+    if( text == "\"" )
+      text = row.GetPattern( "\"", "\"" );
+    else
+      text = zTHelpString::GetString( text );
+
+    zTHelpString::CreateString( stringName, text, lang );
   }
 
 
@@ -169,6 +260,7 @@ namespace GOTHIC_ENGINE {
 
     bool initialized = false;
     zTCombination combination;
+    string currentStringName;
 
     string controlsFile;
     if( !controlsFile.ReadFromVdf( controlsFileName, VDF_DEFAULT | VDF_PHYSICALFIRST ) ) {
@@ -208,10 +300,20 @@ namespace GOTHIC_ENGINE {
       }
 
            // Parse commands
-           if( command == "Combination" )       ParseControlsCombination( combination, row );
-      else if( command == "Emulation" )         ParseControlsEmulation  ( combination, row );
-      else if( command == "Condition" )         ParseControlsCondition  ( combination, row );
-      else if( command == "KeyDescriptions" )   ParseDescriptionsFile   ( row.GetPattern( command, "" ) );
+           if( command == "Combination" ) ParseControlsCombination( combination, row );
+      else if( command == "Emulation" )   ParseControlsEmulation  ( combination, row );
+      else if( command == "Condition" )   ParseControlsCondition  ( combination, row );
+      else if( command == "Help" )        ParseControlsHelp       ( combination, row );
+      else if( command == "String" )      ParseControlsStringName ( currentStringName, row );
+      else if( command == "Rus" )         ParseControlsStringText ( currentStringName, row );
+      else if( command == "Eng" )         ParseControlsStringText ( currentStringName, row );
+      else if( command == "Ger" )         ParseControlsStringText ( currentStringName, row );
+      else if( command == "Deu" )         ParseControlsStringText ( currentStringName, row );
+      else if( command == "Pol" )         ParseControlsStringText ( currentStringName, row );
+      else if( command == "Rou" )         ParseControlsStringText ( currentStringName, row );
+      else if( command == "Ita" )         ParseControlsStringText ( currentStringName, row );
+      else if( command == "Cze" )         ParseControlsStringText ( currentStringName, row );
+      else if( command == "Esp" )         ParseControlsStringText ( currentStringName, row );
       else
         // unknown command !!!
         Message::Fatal( "Unknown control command: " + command );

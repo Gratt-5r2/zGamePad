@@ -7,6 +7,7 @@
 #include "Overlays/GamepadOverlay.cpp"
 #include "Overlays/QuickBar/QuickBar.cpp"
 #include "Overlays/QuickMenu/QuickMenu.cpp"
+#include "Overlays/ControlsHelp/ControlsHelp.cpp"
 #include "Gamepad.cpp"
 #include "ControlParser.cpp"
 #include "ControlOverrides.cpp"

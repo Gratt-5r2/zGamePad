@@ -32,6 +32,7 @@ namespace GOTHIC_ENGINE {
 
   zTCombination::zTCombination() {
     Enabled = false;
+    Help = Null;
     Clear();
   }
 
@@ -56,6 +57,7 @@ namespace GOTHIC_ENGINE {
   
 
   void zTCombination::CheckDisable( JOYKEY& keys ) {
+    SetHelpEnable( false );
     for( uint i = 0; i < Combination.GetNum(); i++ ) {
       JOYKEY key = keys & Combination[i];
       if( !key )
@@ -85,13 +87,13 @@ namespace GOTHIC_ENGINE {
 
 
 
-  bool zTCombination::CheckCondition() {
+  bool zTCombination::CheckAllConditions() {
     for( uint i = 0; i < AllowConditions.GetNum(); i++ )
-      if( !AllowConditions[i]() )
+      if( !Gamepad_GetStaticCondition( AllowConditions[i] ) )
         return false;
 
     for( uint i = 0; i < DenyConditions.GetNum(); i++ )
-      if( DenyConditions[i]() )
+      if( Gamepad_GetStaticCondition( DenyConditions[i] ) )
         return false;
 
     for( uint i = 0; i < AllowButtons.GetNum(); i++ )
@@ -101,8 +103,10 @@ namespace GOTHIC_ENGINE {
     for( uint i = 0; i < DenyButtons.GetNum(); i++ )
       if( zinput->KeyPressed( DenyButtons[i] ) )
         return false;
-    
-    if( !CheckKeyStateCondition() )
+
+    SetHelpEnable( true );
+
+    if( !CheckKeyStateConditions() )
       return false;
 
     return true;
@@ -110,7 +114,7 @@ namespace GOTHIC_ENGINE {
 
 
 
-  bool zTCombination::CheckKeyStateCondition() {
+  bool zTCombination::CheckKeyStateConditions() {
     for( uint i = 0; i < AllowCombinations.GetNum(); i++ )
       if( !HasFlag( KeyStates, AllowCombinations[i] ) )
         return false;
@@ -125,7 +129,7 @@ namespace GOTHIC_ENGINE {
 
 
   bool zTCombination::CheckEnable( JOYKEY& keys ) {
-    if( !CheckCondition() )
+    if( !CheckAllConditions() )
       return false;
 
     JOYKEY flags = keys;
@@ -166,6 +170,13 @@ namespace GOTHIC_ENGINE {
     Enabled = true;
     Toggled = true;
     SetEmulationState( True );
+  }
+
+
+
+  void zTCombination::SetHelpEnable( bool enable ) {
+    if( Help != Null )
+      Help->Enabled = enable;
   }
 
 
@@ -303,6 +314,12 @@ namespace GOTHIC_ENGINE {
     ToggleMode = false;
     Toggled = false;
     KeyStates = None;
+    Help = Null;
+  }
+
+
+
+  zTCombination::~zTCombination() {
   }
 
 
@@ -389,7 +406,7 @@ namespace GOTHIC_ENGINE {
             runActive = true;
 
             // Walk situations
-            bool canWalk = length <= 20000 && !(player && player->fmode) && !IsSneak();
+            bool canWalk = length <= 20000 && !(player && player->fmode) && !Cond_CanSneaking();
 
             KeyStates |= canWalk ?
               GameWalk :
@@ -422,7 +439,7 @@ namespace GOTHIC_ENGINE {
 
 
   void zCXInputDevice::UpdateSticksState() {
-    bool diveMode = IsDive();
+    bool diveMode = Cond_Diving();
     UpdateLeftSticksState();
 
     if( !diveMode )
@@ -472,48 +489,10 @@ namespace GOTHIC_ENGINE {
 
 
 
-#if 0
-  bool ToggleGamepadMenu() {
-    if( ogame->IsOnPause() )
-      return false;
-
-    zTGamepadMenu::GetInstance().Show();
-    return true;
-  }
-
-
-
-  void PrepareGamepadMenu( WORD& keyStates ) {
-    static uint keyStartTimeBegin  = 0;
-    static bool gamepadMenuToggled = false;
-           bool keyStartPressed    = (keyStates & ButtonStart) == ButtonStart;
-
-    if( keyStartPressed ) {
-      keyStates ^= ButtonStart;
-
-      if( !gamepadMenuToggled ) {
-        if( keyStartTimeBegin ) {
-          if( Timer::GetTime() - keyStartTimeBegin >= 1000 && ToggleGamepadMenu() )
-            gamepadMenuToggled = true;
-        }
-        else
-          keyStartTimeBegin = Timer::GetTime();
-      }
-    }
-    else {
-      if( !gamepadMenuToggled && keyStartTimeBegin )
-        keyStates |= ButtonStart;
-      
-      keyStartTimeBegin  = 0;
-      gamepadMenuToggled = false;
-    }
-  }
-#endif
-
-
-
   void zCXInputDevice::UpdateKeyState() {
     static int gamepadID = GetGamepadID();
+    if( !zinput )
+      return;
 
     if( XINPUTGETSTATE( gamepadID, &Gamepad ) == ERROR_DEVICE_NOT_CONNECTED ) {
       DeviceConnected = false;
@@ -522,17 +501,20 @@ namespace GOTHIC_ENGINE {
     else if( !DeviceConnected )
       DeviceConnected = true;
 
-    // PrepareGamepadMenu( Gamepad.Gamepad.wButtons ); // DELETE ME
     KeyStates = Gamepad.Gamepad.wButtons;
     UpdateSticksState();
 
-    if( ForceVideoSkipping() )
+    if( ForceVideoSkipping() || !ogame )
      return;
+
+    // Important: Update a statick condition
+    // information for the faster access !!!
+    Gamepad_UpdateStaticConditions();
 
     for( uint i = 0; i < KeyCombinations.GetNum(); i++ )
       KeyCombinations[i].CheckDisable( KeyStates );
     
-    if( KeyStates )
+    // if( KeyStates ) // For help marks this line is commented
       for( uint i = 0; i < KeyCombinations.GetNum(); i++ )
         KeyCombinations[i].CheckEnable( KeyStates );
 

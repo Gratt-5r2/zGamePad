@@ -42,5 +42,27 @@ namespace GOTHIC_ENGINE {
 		static zCGamepadQuickMenu* quickMenu = zCGamepadQuickMenu::GetInstance();
 		if( zKeyToggled( KEY_3 ) )
 			quickMenu->Show( screen );
+
+		static zCGamepadControlsHelp* controlsHelp = zCGamepadControlsHelp::GetInstance();
+
+		return;
+		// DELETE ME
+		static zCView* test = Null;
+		if( !test ) {
+			test = new zCView();
+			screen->InsertItem( test );
+			test->SetSize( 8192, 8192 );
+			test->SetFont( screen->GetFontName() );
+		}
+
+		test->ClrPrintwin();
+		auto& helps = zTCombination_Help::Helps;
+		for( uint i = 0; i < helps.GetNum(); i++ ) {
+			auto help = helps[i];
+			if( help->Enabled ) {
+				cmd << help->Text << endl;
+				test->Printwin( help->Text );
+			}
+		}
 	}
 }

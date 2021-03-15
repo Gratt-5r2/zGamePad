@@ -235,6 +235,9 @@
     <Filter Include="Plugin\Workspace\Gamepad\Overlays\QuickMenu">
       <UniqueIdentifier>{1d283ee8-2c79-4afb-bb26-4db4d8469c7c}</UniqueIdentifier>
     </Filter>
+    <Filter Include="Plugin\Workspace\Gamepad\Overlays\ControlsHelp">
+      <UniqueIdentifier>{c981cab2-d429-4d2d-8e3c-8c619c419bd4}</UniqueIdentifier>
+    </Filter>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="Interface.cpp">
@@ -2842,6 +2845,12 @@
     </ClInclude>
     <ClInclude Include="Overlays\QuickMenu\QuickMenu.cpp">
       <Filter>Plugin\Workspace\Gamepad\Overlays\QuickMenu</Filter>
+    </ClInclude>
+    <ClInclude Include="Overlays\ControlsHelp\ControlsHelp.cpp">
+      <Filter>Plugin\Workspace\Gamepad\Overlays\ControlsHelp</Filter>
+    </ClInclude>
+    <ClInclude Include="Overlays\ControlsHelp\ControlsHelp.h">
+      <Filter>Plugin\Workspace\Gamepad\Overlays\ControlsHelp</Filter>
     </ClInclude>
   </ItemGroup>
   <ItemGroup>

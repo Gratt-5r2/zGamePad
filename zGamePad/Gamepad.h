@@ -5,37 +5,43 @@ namespace GOTHIC_ENGINE {
 #define STICK_MAX   32768
 #define STICK_MAX_D 32768.0
 #define STICK_MAX_F 32768.0f
-#define DEADZONE_R 10000.0f
+#define DEADZONE_R  10000.0f
 
+
+  typedef bool(*LPCONDFUNC)();
   typedef int JOYKEY, DXKEY;
-  typedef bool( *LPCONDFUNC )();
+  struct zTCombination_Help;
+
 
   struct zTCombination {
-    Array<JOYKEY>     Combination;
-    Array<DXKEY>      Emulation;
-    Array<bool (*)()> AllowConditions;
-    Array<DXKEY>      AllowButtons;
-    Array<DXKEY>      AllowCombinations;
-    Array<bool( *)()> DenyConditions;
-    Array<DXKEY>      DenyButtons;
-    Array<DXKEY>      DenyCombinations;
-    bool              Enabled;
-    bool              ToggleMode;
-    bool              Toggled;
-    JOYKEY            KeyStates;
+    Array<JOYKEY>       Combination;
+    Array<DXKEY>        Emulation;
+    Array<bool (*)()>   AllowConditions;
+    Array<DXKEY>        AllowButtons;
+    Array<DXKEY>        AllowCombinations;
+    Array<bool( *)()>   DenyConditions;
+    Array<DXKEY>        DenyButtons;
+    Array<DXKEY>        DenyCombinations;
+    bool                Enabled;
+    bool                ToggleMode;
+    bool                Toggled;
+    JOYKEY              KeyStates;
+    zTCombination_Help* Help;
 
     zTCombination();
     bool operator == ( const zTCombination& other ) const;
     bool operator <  ( const zTCombination& other ) const;
     bool operator >  ( const zTCombination& other ) const;
+    ~zTCombination();
 
     void CheckDisable( JOYKEY& keys );
     void Disable();
     bool CheckEnable( JOYKEY& keys );
     bool HasToggledKeys();
-    bool CheckCondition();
-    bool CheckKeyStateCondition();
+    bool CheckAllConditions();
+    bool CheckKeyStateConditions();
     void Enable();
+    void SetHelpEnable( bool enable );
     void AddCombination( JOYKEY keys ... );
     void AddEmulation( DXKEY keys ... );
     void AddAllowFunctions( LPCONDFUNC conditions ... );
@@ -132,7 +138,9 @@ namespace GOTHIC_ENGINE {
     void ParseControlsEmulation( zTCombination& combination, string row );
     void ParseControlsEndRecord( zTCombination& combination );
     void ParseControlsCondition( zTCombination& combination, string row );
-    void ParseDescriptionsFile( string fileName );
+    void ParseControlsHelp( zTCombination& combination, string row );
+    void ParseControlsStringName( string& stringName, string row );
+    void ParseControlsStringText( string& stringName, string row );
     Array<zTCombination> KeyCombinations;
     zTVibrationMessage VibrationMessage;
   public:
@@ -157,17 +165,14 @@ namespace GOTHIC_ENGINE {
 
 
 
-
-  bool IsFightMode();
-  bool IsFightModeRange();
-  bool IsCanShoot();
-  bool IsFightModeMelee();
-  bool IsNotFightMode();
-  bool IsSneak();
-  bool IsDive();
   DXKEY GetBinded( uint16 bind );
 
 
+
+  typedef bool( *LPCONDITION )();
+  void Gamepad_SetStaticCondition( LPCONDITION condition );
+  bool Gamepad_GetStaticCondition( LPCONDITION condition );
+  void Gamepad_UpdateStaticConditions();
 
   bool Cond_FightMode();
   bool Cond_FightModeMelee();
@@ -180,16 +185,20 @@ namespace GOTHIC_ENGINE {
   bool Cond_HasFocusNpc();
   bool Cond_TargetIsLocked();
   bool Cond_OnChooseWeapon();
-  bool Cond_OnSpellBook();
   bool Cond_InventoryIsOpen();
-  bool Cond_InterfaceIsOpen();
-  bool Cond_IsOverlayTop();
   bool Cond_InTransformation();
   bool Cond_CanQuickPotionDrink();
   bool Cond_VideoIsOpen();
   bool Cond_CanLockTarget();
   bool Cond_G1();
   bool Cond_G2();
+  bool Cond_IsDialogTop();
+  bool Cond_IsDocumentTop();
+  bool Cond_IsOverlayTop();
+  bool Cond_IsMenuTop();
+  bool Cond_OnSpellBook();
+  bool Cond_IsPlayerTalking();
+  bool Cond_InterfaceIsOpen();
 
 
 

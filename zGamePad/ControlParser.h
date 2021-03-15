@@ -2,6 +2,26 @@
 // Union HEADER file
 
 namespace GOTHIC_ENGINE {
+  struct zTHelpString {
+    static Array<zTHelpString> HelpStrings;
+
+    struct zTHelpString_Item {
+      TSystemLangID LangID;
+      string Text;
+    };
+
+    zTHelpString();
+
+    string Name;
+    Array<zTHelpString_Item> Items;
+    void SetText( const string& text, const string& lang );
+    string GetText();
+    static void CreateString( const string& name, const string& text, const string& lang );
+    static string GetString( const string& name );
+  };
+
+
+
 #define	JOY_UP            ArrowUp
 #define	JOY_DOWN          ArrowDown
 #define	JOY_LEFT          ArrowLeft
@@ -283,16 +303,20 @@ namespace GOTHIC_ENGINE {
     CHECKCODE( Cond_HasFocusNpc );
     CHECKCODE( Cond_TargetIsLocked );
     CHECKCODE( Cond_OnChooseWeapon );
-    CHECKCODE( Cond_OnSpellBook );
     CHECKCODE( Cond_InventoryIsOpen );
-    CHECKCODE( Cond_InterfaceIsOpen );
-    CHECKCODE( Cond_IsOverlayTop );
     CHECKCODE( Cond_InTransformation );
     CHECKCODE( Cond_CanQuickPotionDrink );
     CHECKCODE( Cond_VideoIsOpen );
     CHECKCODE( Cond_CanLockTarget );
     CHECKCODE( Cond_G1 );
     CHECKCODE( Cond_G2 );
+    CHECKCODE( Cond_IsDialogTop );
+    CHECKCODE( Cond_IsDocumentTop );
+    CHECKCODE( Cond_IsOverlayTop );
+    CHECKCODE( Cond_IsMenuTop );
+    CHECKCODE( Cond_OnSpellBook );
+    CHECKCODE( Cond_IsPlayerTalking );
+    CHECKCODE( Cond_InterfaceIsOpen );
 #undef CHECKCODE
     return Null;
   }

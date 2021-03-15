@@ -504,6 +504,14 @@
       <SubType>
       </SubType>
     </ClInclude>
+    <ClInclude Include="Overlays\ControlsHelp\ControlsHelp.cpp">
+      <SubType>
+      </SubType>
+    </ClInclude>
+    <ClInclude Include="Overlays\ControlsHelp\ControlsHelp.h">
+      <SubType>
+      </SubType>
+    </ClInclude>
     <ClInclude Include="Overlays\GamepadOverlay.h">
       <SubType>
       </SubType>
