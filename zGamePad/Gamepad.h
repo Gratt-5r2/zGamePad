@@ -100,7 +100,10 @@ namespace GOTHIC_ENGINE {
     GameLeftStrafe   = 1 << 19,
     GameRightStrafe  = 1 << 20,
     GamePunch        = 1 << 21,
-    GameParade       = 1 << 22
+    GameParade       = 1 << 22,
+
+    ArrowPad_Full    = 1 << 25,
+    ArrowPad_UpDown  = 1 << 26
   };
 
   struct zTStickState {

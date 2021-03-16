@@ -5,6 +5,7 @@ namespace GOTHIC_ENGINE {
   zTGamepadQuickBarCell::zTGamepadQuickBarCell() {
     Item = Null;
     InstanceID = Invalid;
+    Offset = 1.0f;
     Background = new zCView( 0, 0, 8192, 8192 );
     Background_Highlight = new zCView( 0, 0, 8192, 8192 );
     Background_Highlight->SetAlphaBlendFunc( zRND_ALPHA_FUNC_ADD );
@@ -81,14 +82,37 @@ namespace GOTHIC_ENGINE {
 
 
 
-  void zCGamepadQuickBar::PushItem( oCItem* item, const uint& circleID ) {
+  zTGamepadQuickBarCell& zCGamepadQuickBar::PushItem( oCItem* item, const uint& circleID ) {
     if( Circles.GetNum() < circleID + 1 ) {
       uint needCirclesNum = circleID + 1 - Circles.GetNum();
       for( uint i = 0; i < needCirclesNum; i++ )
         Circles.Create();
     }
 
-    Circles[circleID].Create().SetItem( item );
+    auto& cell = Circles[circleID].Create();
+    cell.SetItem( item );
+    return cell;
+  }
+
+
+
+  static Array<float> QuickBar_ReadOffsets() {
+    Array<float> offsets;
+    string QuickSlots_Option = "1.3, 1.0";
+    Union.GetSysPackOption().Read( QuickSlots_Option, "zGamePad", "QuickBar_Offsets", QuickSlots_Option );
+    QuickSlots_Option.Regex_Replace( "\\s", "" );
+    Array<string> tokens = QuickSlots_Option.Split( "," );
+    for( uint i = 0; i < tokens.GetNum(); i++ )
+      offsets += tokens[i].ToReal32();
+    
+    return offsets;
+  }
+
+  static Array<string> QuickBar_ReadCounts() {
+    string QuickSlots_Option = "2, 7";
+    Union.GetSysPackOption().Read( QuickSlots_Option, "zGamePad", "QuickBar_Counts", QuickSlots_Option );
+    QuickSlots_Option.Regex_Replace( "\\s", "" );
+    return QuickSlots_Option.Split( "," );
   }
 
 
@@ -111,8 +135,8 @@ namespace GOTHIC_ENGINE {
       for( uint j = 0; j < cellsNum; j++ ) {
         auto& cell = Circles[i][j];
         int itemRendererSize = distancePerCircle * 75 / 100; // (int)((float)distancePerCircle * 0.75f);
-        cell.SetViewport( 4096 + itemPosition[VX] - itemRendererSize / 2,
-                          4096 - itemPosition[VY] - itemRendererSize / 2,
+        cell.SetViewport( 4096 + itemPosition[VX] * cell.Offset - itemRendererSize / 2,
+                          4096 - itemPosition[VY] * cell.Offset - itemRendererSize / 2,
                           itemRendererSize,
                           itemRendererSize );
 
@@ -452,16 +476,14 @@ namespace GOTHIC_ENGINE {
 
 
   zCGamepadQuickBar_Items::zCGamepadQuickBar_Items() : zCGamepadQuickBar() {
+    Array<string> counts = QuickBar_ReadCounts();
+    Array<float> offsets = QuickBar_ReadOffsets();
 
-    string QuickSlots_Option = "2, 7";
-    Union.GetSysPackOption().Read( QuickSlots_Option, "zGamePad", "QuickBar_Counts", QuickSlots_Option );
-    QuickSlots_Option.Regex_Replace( "\\s", "" );
-    Array<string> QuickSlots_Tokens = QuickSlots_Option.Split( "," );
-
-    for( uint i = 0; i < QuickSlots_Tokens.GetNum(); i++ ) {
-      uint numInCircle = QuickSlots_Tokens[i].ToInt32();
+    for( uint i = 0; i < counts.GetNum(); i++ ) {
+      uint numInCircle = counts[i].ToInt32();
+      float offset = i < offsets.GetNum() ? offsets[i] : 1.0f;
       for( uint j = 0; j < numInCircle; j++ )
-        PushItem( Null, i );
+        PushItem( Null, i ).Offset = offset;
     }
 
     string QuickSlots_TextureBase = "QUICKSLOT";

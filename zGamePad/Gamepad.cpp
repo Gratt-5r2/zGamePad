@@ -132,6 +132,9 @@ namespace GOTHIC_ENGINE {
     if( !CheckAllConditions() )
       return false;
 
+    if( Emulation.GetNum() == 0 )
+      return false;
+
     JOYKEY flags = keys;
     bool success = true;
 

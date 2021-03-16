@@ -2,6 +2,23 @@
 // Union HEADER file
 
 namespace GOTHIC_ENGINE {
+  class zCCombination_SpriteList {
+    struct zTSprite {
+      zCView* XBOX;
+      zCView* PS;
+      zCView* GetSprite( const int gamepadID );
+      zTSprite( const string& xboxTex, const string& psTex );
+    };
+
+    Map<JOYKEY, zTSprite*> SpriteList;
+    int GamepadID;
+    zCCombination_SpriteList();
+    void Initialize();
+  public:
+
+    zCView* GetSprite( JOYKEY key );
+    static zCCombination_SpriteList& GetInstance();
+  };
 
 
   struct zTCombination_Help : public zCObject {

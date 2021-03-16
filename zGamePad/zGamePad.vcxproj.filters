@@ -2852,6 +2852,9 @@
     <ClInclude Include="Overlays\ControlsHelp\ControlsHelp.h">
       <Filter>Plugin\Workspace\Gamepad\Overlays\ControlsHelp</Filter>
     </ClInclude>
+    <ClInclude Include="Overlays\ControlsHelp\ControlsHelp_Sprites.cpp">
+      <Filter>Plugin\Workspace\Gamepad\Overlays\ControlsHelp</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <None Include=".build_settings.inl">

@@ -16,7 +16,6 @@ namespace GOTHIC_ENGINE {
     Keys = keys;
     Enabled = false;
     Helps += this;
-    cmd << text << endl;
   }
 
 
@@ -33,7 +32,6 @@ namespace GOTHIC_ENGINE {
 
   zTCombination_Help::~zTCombination_Help() {
     Helps -= this;
-    cmd << "~" << Text << endl;
   }
 
 
@@ -68,7 +66,6 @@ namespace GOTHIC_ENGINE {
     Parent->InsertItem( this );
     SetSize( 8192, 8192 );
     IsOpened = true;
-    cmd << "Showed" << endl;
   }
 
 
@@ -87,7 +84,9 @@ namespace GOTHIC_ENGINE {
   void zCGamepadControlsHelp::Blit() {
     InsertItem( Background );
 
-    auto& helps = zTCombination_Help::Helps;
+    auto spriteList = zCCombination_SpriteList::GetInstance();
+    auto& helps     = zTCombination_Help::Helps;
+
     for( uint i = 0, e = 0; i < helps.GetNum(); i++ ) {
       auto& help = helps[i];
       if( !help->Enabled )
@@ -96,12 +95,31 @@ namespace GOTHIC_ENGINE {
       zSTRING text = help->Text;
       int fontX    = FontSize( text );
       int fontY    = FontY();
+      int spriteSY = fontY;
+      int spriteSX = anx( nay( fontY ) );
+      uint keysNum = help->Keys.GetNum();
+      int backSX   = fontX;
+      int backSY   = fontY;
+      int backPX   = 8192 - fontX - spriteSX * (int&)keysNum;
+      int backPY   = 7200 - fontY * e++;
 
       Background->ClrPrintwin();
-      Background->SetSize( fontX, fontY );
+      Background->SetSize( backSX, backSY );
       Background->Print( 0, 0, text );
-      Background->SetPos( 8192 - fontX, 7200 - fontY * 2 * e++ );
+      Background->SetPos( backPX, backPY );
       Background->Blit();
+
+      for( uint k = 0; k < keysNum; k++ ) {
+        zCView* sprite = spriteList.GetSprite( help->Keys[k] );
+        if( sprite == Null )
+          continue;
+
+        InsertItem( sprite );
+        sprite->SetPos( backPX + backSX + spriteSX * k, backPY );
+        sprite->SetSize( spriteSX, spriteSY );
+        sprite->Blit();
+        RemoveItem( sprite );
+      }
     }
 
     RemoveItem( Background );

@@ -43,6 +43,8 @@ namespace GOTHIC_ENGINE {
 #define	JOY_LSTICK_RIGHT  GameRightStrafe
 #define	JOY_RT            GamePunch
 #define	JOY_LT            GameParade
+#define	JOY_DPAD_FULL     ArrowPad_Full
+#define	JOY_DPAD_UPDOWN   ArrowPad_UpDown
 
 
 
@@ -69,6 +71,8 @@ namespace GOTHIC_ENGINE {
     CHECKCODE( JOY_LSTICK_RIGHT );
     CHECKCODE( JOY_RT );
     CHECKCODE( JOY_LT );
+    CHECKCODE( JOY_DPAD_FULL );
+    CHECKCODE( JOY_DPAD_UPDOWN );
 #undef CHECKCODE
     return None;
   }

@@ -45,8 +45,8 @@ namespace GOTHIC_ENGINE {
 		ActiveOverlay = Null;
 		SetFont( "FONT_OLD_20_WHITE.TGA" );
 
-		InsertChild( zCGamepadQuickBar_Weapons::GetInstance() );
 		InsertChild( zCGamepadQuickBar_Items::GetInstance() );
+		InsertChild( zCGamepadQuickBar_Weapons::GetInstance() );
 
 		LeftSide = new zCView();
 		LeftSide->InsertBack( "QUICKMENU_LEFTSIDE.TGA" );
@@ -83,7 +83,7 @@ namespace GOTHIC_ENGINE {
 		SetSize( 8192, 8192 );
 		IsOpened = True;
 
-		SetSelectedMenu( 0 );
+		SetSelectedMenu( zKeyPressed( KEY_LSHIFT ) ? Childs.GetNum() - 1 : 0 );
 
 		int itemsCount			= Selectors.GetNum();
 		int itemSizeY				= FontY() * 2;

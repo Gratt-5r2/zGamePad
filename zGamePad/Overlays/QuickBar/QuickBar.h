@@ -12,6 +12,7 @@ namespace GOTHIC_ENGINE {
 	struct zTGamepadQuickBarCell {
 		oCItem* Item;
 		int InstanceID;
+		float Offset;
 		zCView* Background;
 		zCView* Background_Highlight;
 		zCView* ItemRenderer;
@@ -42,7 +43,7 @@ namespace GOTHIC_ENGINE {
 		void SetBaseTextureName( const zSTRING& textureName );
 		void SetItem( oCItem* item, uint& circleID, uint& cellID );
 		bool SetItemInActiveCell( oCItem* item );
-		void PushItem( oCItem* item, const uint& circleID );
+		zTGamepadQuickBarCell& PushItem( oCItem* item, const uint& circleID );
 		void UpdateCells();
 		zTGamepadQuickBarCell& GetCell( const uint& circleID, const uint& cellID );
 		virtual void Blit();
