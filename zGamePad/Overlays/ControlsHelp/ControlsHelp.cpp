@@ -50,9 +50,11 @@ namespace GOTHIC_ENGINE {
 
 
   zCGamepadControlsHelp::zCGamepadControlsHelp() {
+    static int alpha = GetHintsTransparency();
     Show( ogame->viewport ); // screen
     Background = new zCView();
     Background->SetFont( screen->GetFontName() );
+    Background->fontColor.alpha = alpha;
     SetFont( screen->GetFontName() );
   }
 
@@ -82,6 +84,10 @@ namespace GOTHIC_ENGINE {
 
 
   void zCGamepadControlsHelp::Blit() {
+    static bool hintsEnabled = GetHintsEnabled();
+    if( !hintsEnabled )
+      return;
+
     InsertItem( Background );
 
     auto spriteList = zCCombination_SpriteList::GetInstance();
@@ -92,9 +98,11 @@ namespace GOTHIC_ENGINE {
       if( !help->Enabled )
         continue;
 
+      static float iconScale = GetHintsIconScale();
+
       zSTRING text = help->Text;
       int fontX    = FontSize( text );
-      int fontY    = FontY();
+      int fontY    = (int)((float)FontY() * iconScale);
       int spriteSY = fontY;
       int spriteSX = anx( nay( fontY ) );
       uint keysNum = help->Keys.GetNum();
@@ -105,7 +113,7 @@ namespace GOTHIC_ENGINE {
 
       Background->ClrPrintwin();
       Background->SetSize( backSX, backSY );
-      Background->Print( 0, 0, text );
+      Background->PrintCY( 0, text );
       Background->SetPos( backPX, backPY );
       Background->Blit();
 

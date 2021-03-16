@@ -48,4 +48,28 @@ namespace GOTHIC_ENGINE {
 		virtual void Blit();
 		static zCGamepadControlsHelp* GetInstance();
 	};
+
+
+
+  static int GetHintsTransparency() {
+    int alpha = 185;
+    Union.GetSysPackOption().Read( alpha, "zGamePad", "HintsTransparency", alpha );
+    return alpha;
+  }
+
+
+
+  static float GetHintsIconScale() {
+    float scale = 2.0f;
+    Union.GetSysPackOption().Read( scale, "zGamePad", "GetHintsIconScale", scale );
+    return scale;
+  }
+
+
+
+  static bool GetHintsEnabled() {
+    bool enabled = true;
+    Union.GetSysPackOption().Read( enabled, "zGamePad", "HintsEnabled", enabled );
+    return enabled;
+  }
 }

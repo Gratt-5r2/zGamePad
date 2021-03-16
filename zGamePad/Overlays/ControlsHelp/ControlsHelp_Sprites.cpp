@@ -3,10 +3,15 @@
 
 namespace GOTHIC_ENGINE {
   zCCombination_SpriteList::zTSprite::zTSprite( const string& xboxTex, const string& psTex ) {
+    static int alpha =  GetHintsTransparency();
     XBOX = new zCView();
     PS = new zCView();
     XBOX->InsertBack( xboxTex );
     PS->InsertBack( psTex );
+    XBOX->SetAlphaBlendFunc( zRND_ALPHA_FUNC_BLEND );
+    PS->SetAlphaBlendFunc( zRND_ALPHA_FUNC_BLEND );
+    XBOX->SetTransparency( alpha );
+    PS->SetTransparency( alpha );
   }
 
 
@@ -49,6 +54,8 @@ namespace GOTHIC_ENGINE {
     SpriteList.Insert( JOY_RT,           new zTSprite( "XboxOne_RT",                "" ) );
     SpriteList.Insert( JOY_DPAD_FULL,    new zTSprite( "XboxOne_Dpad",              "" ) );
     SpriteList.Insert( JOY_DPAD_UPDOWN,  new zTSprite( "XboxOne_Dpad_UpDown",       "" ) );
+    SpriteList.Insert( JOY_LSTICK_FULL,  new zTSprite( "XboxOne_Left_Stick",        "" ) );
+    SpriteList.Insert( JOY_RSTICK_FULL,  new zTSprite( "XboxOne_Right_Stick",       "" ) );
   }
 
 

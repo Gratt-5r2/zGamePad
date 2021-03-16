@@ -103,7 +103,9 @@ namespace GOTHIC_ENGINE {
     GameParade       = 1 << 22,
 
     ArrowPad_Full    = 1 << 25,
-    ArrowPad_UpDown  = 1 << 26
+    ArrowPad_UpDown  = 1 << 26,
+    LeftStick        = 1 << 27,
+    RightStick       = 1 << 28,
   };
 
   struct zTStickState {
