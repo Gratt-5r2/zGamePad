@@ -11,7 +11,7 @@ namespace GOTHIC_ENGINE {
     };
 
     Map<JOYKEY, zTSprite*> SpriteList;
-    int GamepadID;
+    int ControllerScheme;
     zCCombination_SpriteList();
     void Initialize();
   public:
@@ -61,7 +61,7 @@ namespace GOTHIC_ENGINE {
 
   static float GetHintsIconScale() {
     float scale = 2.0f;
-    Union.GetSysPackOption().Read( scale, "zGamePad", "GetHintsIconScale", scale );
+    Union.GetSysPackOption().Read( scale, "zGamePad", "HintsIconScale", scale );
     return scale;
   }
 

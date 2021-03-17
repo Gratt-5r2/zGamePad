@@ -51,7 +51,7 @@ namespace GOTHIC_ENGINE {
 
   zCGamepadControlsHelp::zCGamepadControlsHelp() {
     static int alpha = GetHintsTransparency();
-    Show( ogame->viewport ); // screen
+    Show( ogame->viewport );
     Background = new zCView();
     Background->SetFont( screen->GetFontName() );
     Background->fontColor.alpha = alpha;
@@ -113,7 +113,7 @@ namespace GOTHIC_ENGINE {
 
       Background->ClrPrintwin();
       Background->SetSize( backSX, backSY );
-      Background->PrintCY( 0, text );
+      Background->PrintCXY( text );
       Background->SetPos( backPX, backPY );
       Background->Blit();
 

@@ -26,14 +26,17 @@ namespace GOTHIC_ENGINE {
 
 	class zCGamepadQuickBar : public zCGamepadOverlay {
 	protected:
-		Array<Array<zTGamepadQuickBarCell>> Circles;
+		Array<Array<zTGamepadQuickBarCell>> Rings;
 		zSTRING BaseTextureName;
 		void BlitCells();
 		void ShowCells();
 		void CloseCells();
-		uint LastCircleID;
+		uint LastRingID;
 		uint LastCellID;
 		bool NeedToMarkEquipedItems;
+		zTStickState StickStateLeft;
+		zTStickState StickStateRight;
+		zVEC2 MouseState;
 	public:
 		zEGamepadQuickBarAlignment Alignment;
 

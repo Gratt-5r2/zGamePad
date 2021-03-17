@@ -1,0 +1,15 @@
+#engine
+    #patch
+        OptionDef( BOOL  @GAME:ZGAMEPAD:Enabled,              1 )
+        OptionDef( INT   @GAME:ZGAMEPAD:ControllerID,         0 )
+        OptionDef( HEX   @GAME:ZGAMEPAD:ControlsFile,         "Controls.Gamepad" )
+        OptionDef( FLOAT @GAME:ZGAMEPAD:StickSensitivity,     0.3 )
+        OptionDef( BOOL  @GAME:ZGAMEPAD:HintsEnabled,         1 )
+        OptionDef( INT   @GAME:ZGAMEPAD:ControllerScheme,     0 )
+        OptionDef( FLOAT @GAME:ZGAMEPAD:HintsIconScale,       0.3 )
+        OptionDef( FLOAT @GAME:ZGAMEPAD:HintsTransparency,    0.7 )
+        OptionDef( HEX   @GAME:ZGAMEPAD:QuickBar_Counts,      "4, 9" )
+        OptionDef( HEX   @GAME:ZGAMEPAD:QuickBar_TextureBase, "QUICKSLOT" )
+        OptionDef( HEX   @GAME:ZGAMEPAD:QuickBar_Offsets,     "1.3, 1.0" )
+    #/patch
+#/engine

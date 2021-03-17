@@ -40,7 +40,7 @@ namespace GOTHIC_ENGINE {
 
   zCGamepadQuickBar::zCGamepadQuickBar() : zCGamepadOverlay() {
     Alignment     = zEGamepadQuickBarAlignment_Right;
-    LastCircleID = Invalid;
+    LastRingID = Invalid;
     LastCellID   = Invalid;
     SetFont( "FONT_OLD_20_WHITE.TGA" );
     NeedToMarkEquipedItems = false;
@@ -54,26 +54,26 @@ namespace GOTHIC_ENGINE {
 
 
 
-  void zCGamepadQuickBar::SetItem( oCItem* item, uint& circleID, uint& cellID ) {
+  void zCGamepadQuickBar::SetItem( oCItem* item, uint& ringID, uint& cellID ) {
     if( item != Null ) {
       int instance = item->instanz;
-      for( uint i = 0; i < Circles.GetNum(); i++ )
-        for( uint j = 0; j < Circles[i].GetNum(); j++ )
-          if( Circles[i][j].InstanceID == instance )
-            Circles[i][j].InstanceID = Invalid;
+      for( uint i = 0; i < Rings.GetNum(); i++ )
+        for( uint j = 0; j < Rings[i].GetNum(); j++ )
+          if( Rings[i][j].InstanceID == instance )
+            Rings[i][j].InstanceID = Invalid;
     }
 
-    auto& cell = GetCell( circleID, cellID );
+    auto& cell = GetCell( ringID, cellID );
     cell.SetItem( item );
   }
 
 
 
   bool zCGamepadQuickBar::SetItemInActiveCell( oCItem* item ) {
-    uint circleID, cellID;
-    GetSelectedCellID( circleID, cellID );
-    if( circleID != Invalid && cellID != Invalid ) {
-      SetItem( item, circleID, cellID );
+    uint ringID, cellID;
+    GetSelectedCellID( ringID, cellID );
+    if( ringID != Invalid && cellID != Invalid ) {
+      SetItem( item, ringID, cellID );
       return true;
     }
 
@@ -82,14 +82,14 @@ namespace GOTHIC_ENGINE {
 
 
 
-  zTGamepadQuickBarCell& zCGamepadQuickBar::PushItem( oCItem* item, const uint& circleID ) {
-    if( Circles.GetNum() < circleID + 1 ) {
-      uint needCirclesNum = circleID + 1 - Circles.GetNum();
-      for( uint i = 0; i < needCirclesNum; i++ )
-        Circles.Create();
+  zTGamepadQuickBarCell& zCGamepadQuickBar::PushItem( oCItem* item, const uint& ringID ) {
+    if( Rings.GetNum() < ringID + 1 ) {
+      uint needRingsNum = ringID + 1 - Rings.GetNum();
+      for( uint i = 0; i < needRingsNum; i++ )
+        Rings.Create();
     }
 
-    auto& cell = Circles[circleID].Create();
+    auto& cell = Rings[ringID].Create();
     cell.SetItem( item );
     return cell;
   }
@@ -118,23 +118,23 @@ namespace GOTHIC_ENGINE {
 
 
   void zCGamepadQuickBar::UpdateCells() {
-    uint circlesNum = Circles.GetNum();
-    if( circlesNum == 0 )
+    uint ringsNum = Rings.GetNum();
+    if( ringsNum == 0 )
       return;
 
-    uint distancePerCircle = 4196 / circlesNum;
-    for( uint i = 0; i < circlesNum; i++ ) {
-      uint cellsNum = Circles[i].GetNum();
+    uint distancePerRing = 4196 / ringsNum;
+    for( uint i = 0; i < ringsNum; i++ ) {
+      uint cellsNum = Rings[i].GetNum();
       if( !cellsNum )
         continue;
 
       float anglePerCell = RAD360 / (float)cellsNum;
-      zVEC2 itemPosition( 0.0f, distancePerCircle * (i + 1) - distancePerCircle / 2 );
+      zVEC2 itemPosition( 0.0f, distancePerRing * (i + 1) - distancePerRing / 2 );
       itemPosition.Rotate( anglePerCell * 0.5f );
 
       for( uint j = 0; j < cellsNum; j++ ) {
-        auto& cell = Circles[i][j];
-        int itemRendererSize = distancePerCircle * 75 / 100; // (int)((float)distancePerCircle * 0.75f);
+        auto& cell = Rings[i][j];
+        int itemRendererSize = distancePerRing * 75 / 100; // (int)((float)distancePerRing * 0.75f);
         cell.SetViewport( 4096 + itemPosition[VX] * cell.Offset - itemRendererSize / 2,
                           4096 - itemPosition[VY] * cell.Offset - itemRendererSize / 2,
                           itemRendererSize,
@@ -151,55 +151,99 @@ namespace GOTHIC_ENGINE {
 
 
 
-  zTGamepadQuickBarCell& zCGamepadQuickBar::GetCell( const uint& circleID, const uint& cellID ) {
-    return Circles[circleID][cellID];
+  zTGamepadQuickBarCell& zCGamepadQuickBar::GetCell( const uint& ringID, const uint& cellID ) {
+    return Rings[ringID][cellID];
   }
 
 
 
-  void zCGamepadQuickBar::GetSelectedCellID( uint& circleID, uint& cellID ) {
+  extern void Input_GetMousePosReal( float& x, float& y, float& z );
+
+  float SmoothIncrease( const float& value, const float& max, const uint& strength = 1 ) {
+    static float limit = PI / 2.0f;
+    float multiplier = limit / max;
+    float result = value;
+
+    for( uint i = 0; i < strength; i++ )
+      result = (cos( result * multiplier + PI ) + 1.0f) * max;
+
+    return result;
+  }
+
+  void zCGamepadQuickBar::GetSelectedCellID( uint& ringID, uint& cellID ) {
+    static float stickCircleMax = 25000.0f;
     if( !IsOpened ) {
-      circleID = LastCircleID;
-      cellID   = LastCellID;
+      ringID = LastRingID;
+      cellID = LastCellID;
       return;
     }
 
-    circleID = Invalid;
-    cellID   = Invalid;
-    uint circlesNum = Circles.GetNum();
-    if( !circlesNum )
-      return;
-    
-    static zTStickState stickLeft, stickRight;
-    XInputDevice.GetStickStatesCircle( stickLeft, stickRight );
-
-    // TO DO поменять ход от центрального круга
-    int stickDistInline = STICK_MAX * 0.3;
-    int stickDistPerCircle = STICK_MAX * 0.7 / (int&)circlesNum;
-    int stickLength = stickRight.Length();
-    if( stickLength <= DEADZONE_R / 3 )
+    ringID = Invalid;
+    cellID = Invalid;
+    uint ringsNum = Rings.GetNum();
+    if( !ringsNum )
       return;
 
-    circleID     = stickRight.Length() / (stickDistInline + stickDistPerCircle);
-    LastCircleID = circleID;
-    auto& circle = Circles[circleID];
-    if( circle.IsEmpty() )
+    static const float JOY_EPS = 0.01f;
+    static const float MOUSE_EPS = 0.0005f;
+
+    // Define a stick offset in ring coordinates
+    XInputDevice.GetStickStatesCircle( StickStateLeft, StickStateRight );
+    zVEC2 stickVector = zVEC2( (float)StickStateRight.X, (float)StickStateRight.Y );
+    if( stickVector.Length() < JOY_EPS ) {
+
+      // Alternative select method
+      // with using the mouse device
+      float x, y, z;
+      Input_GetMousePosReal( x, y, z );
+      if( abs( x + y ) > MOUSE_EPS ) {
+        MouseState += zVEC2( x, -y ) * 500.0f;
+        if( MouseState.Length() > stickCircleMax )
+          MouseState.Normalize() *= stickCircleMax;
+      }
+
+      stickVector += MouseState;
+    }
+    else {
+      MouseState = 0.0f;
+      cmd << StickStateRight.Length() << endl;
+    }
+
+    // Accent to the more comfortable selection of
+    // center rings. Range of collisions in center in
+    // quicbar must be large then at the edge.
+    float smoothedLength = SmoothIncrease( stickVector.Length(), (float)stickCircleMax, 3 );
+    stickVector.Normalize() *= smoothedLength;
+
+    // Radius of one ring of ring
+    int stickDistPerRing = (int)stickCircleMax / (int&)ringsNum;
+    if( stickVector.Length() <= JOY_EPS )
       return;
 
-    float anglePerCell = RAD360 / (float)circle.GetNum();
-    zVEC2 vector       = zVEC2( (float)stickRight.X, (float)stickRight.Y );
-    float angle         = vector.GetAngle();
-    cellID             = angle / RAD360 * ((float)circle.GetNum());
-    LastCellID         = cellID;
+    // Current ring id by stick offset
+    ringID = (int)stickVector.Length() / stickDistPerRing;
+    if( ringID >= Rings.GetNum() )
+      ringID = Rings.GetNum() - 1;
+
+    LastRingID = ringID;
+    auto& ring = Rings[ringID];
+    if( ring.IsEmpty() )
+      return;
+
+    // Current cell by stick angle
+    float anglePerCell = RAD360 / (float)ring.GetNum();
+    float angle = stickVector.GetAngle();
+    cellID = angle / RAD360 * ((float)ring.GetNum());
+    LastCellID = cellID;
   }
 
 
 
   oCItem* zCGamepadQuickBar::GetSelectedItem() {
-    uint circleID, cellID;
-    GetSelectedCellID( circleID, cellID );
-    if( circleID != Invalid && cellID != Invalid )
-      return GetCell( circleID, cellID ).Item;
+    uint ringID, cellID;
+    GetSelectedCellID( ringID, cellID );
+    if( ringID != Invalid && cellID != Invalid )
+      return GetCell( ringID, cellID ).Item;
     
     return Null;
   }
@@ -212,14 +256,14 @@ namespace GOTHIC_ENGINE {
     static zCWorld* wld  = zfactory->CreateWorld();
     float highlightAlpha = sin(((float)Timer::GetTime()) * 0.01f) * 40.0f;
 
-    uint circleID, cellID;
-    GetSelectedCellID( circleID, cellID );
+    uint ringID, cellID;
+    GetSelectedCellID( ringID, cellID );
 
-    for( uint i = 0; i < Circles.GetNum(); i++ ) {
-      auto& circle = Circles[i];
-      for( uint j = 0; j < circle.GetNum(); j++ ) {
-        bool needHighlight = circleID == i && cellID == j;
-        auto& cell         = circle[j];
+    for( uint i = 0; i < Rings.GetNum(); i++ ) {
+      auto& ring = Rings[i];
+      for( uint j = 0; j < ring.GetNum(); j++ ) {
+        bool needHighlight = ringID == i && cellID == j;
+        auto& cell         = ring[j];
         oCItem* item       = cell.Item;
 
         cell.Background_Highlight->SetTransparency( 215 + (int)highlightAlpha );
@@ -262,10 +306,10 @@ namespace GOTHIC_ENGINE {
 
 
   void zCGamepadQuickBar::Blit() {
-    uint circleID, cellID;
-    GetSelectedCellID( circleID, cellID );
-    if( circleID != Invalid && cellID != Invalid ) {
-      auto& cell = GetCell( circleID, cellID );
+    uint ringID, cellID;
+    GetSelectedCellID( ringID, cellID );
+    if( ringID != Invalid && cellID != Invalid ) {
+      auto& cell = GetCell( ringID, cellID );
       if( cell.Item != Null ) {
         zSTRING& itemName   = cell.Item->description;
         int itemAmount      = cell.Item->amount;
@@ -322,16 +366,17 @@ namespace GOTHIC_ENGINE {
   void zCGamepadQuickBar::ShowCells() {
     Array<zTGamepadQuickBarCell*> needToFind;
 
-    for( uint i = 0; i < Circles.GetNum(); i++ ) {
-      auto& circle = Circles[i];
-      for( uint j = 0; j < circle.GetNum(); j++ ) {
-        if( circle[j].InstanceID != Invalid ) {
-          needToFind.Insert( &circle[j] );
-          circle[j].Item = Null;
+    for( uint i = 0; i < Rings.GetNum(); i++ ) {
+      auto& ring = Rings[i];
+      for( uint j = 0; j < ring.GetNum(); j++ ) {
+        if( ring[j].InstanceID != Invalid ) {
+          needToFind.Insert( &ring[j] );
+          ring[j].Item = Null;
         }
       }
     }
 
+#if ENGINE >= Engine_G2
     player->inventory2.UnpackAllItems();
     auto list = player->inventory2.contents->next;
     while( list ) {
@@ -345,8 +390,23 @@ namespace GOTHIC_ENGINE {
 
       list = list->next;
     }
+#else
+    player->inventory2.UnpackAllItems();
+    for( uint i = 0; i < INV_MAX; i++ ) {
+      auto list = player->inventory2.inventory[i].next;
+      while( list ) {
+        oCItem* item = list->data;
+        for( uint i = 0; i < needToFind.GetNum(); i++ ) {
+          if( needToFind[i]->InstanceID == item->instanz ) {
+            needToFind[i]->Item = item;
+            needToFind.RemoveAt( i-- );
+          }
+        }
 
-    // TO DO g1
+        list = list->next;
+      }
+    }
+#endif
   }
 
 
@@ -367,10 +427,10 @@ namespace GOTHIC_ENGINE {
 
 
   void zCGamepadQuickBar::CloseCells() {
-    /*for( uint i = 0; i < Circles.GetNum(); i++ ) {
-      auto& circle = Circles[i];
-      for( uint j = 0; j < circle.GetNum(); j++ )
-        circle[j].Item = Null;
+    /*for( uint i = 0; i < Rings.GetNum(); i++ ) {
+      auto& ring = Rings[i];
+      for( uint j = 0; j < ring.GetNum(); j++ )
+        ring[j].Item = Null;
     }*/
   }
 
@@ -480,9 +540,9 @@ namespace GOTHIC_ENGINE {
     Array<float> offsets = QuickBar_ReadOffsets();
 
     for( uint i = 0; i < counts.GetNum(); i++ ) {
-      uint numInCircle = counts[i].ToInt32();
+      uint numInRing = counts[i].ToInt32();
       float offset = i < offsets.GetNum() ? offsets[i] : 1.0f;
-      for( uint j = 0; j < numInCircle; j++ )
+      for( uint j = 0; j < numInRing; j++ )
         PushItem( Null, i ).Offset = offset;
     }
 
@@ -495,27 +555,27 @@ namespace GOTHIC_ENGINE {
 
 
   void zCGamepadQuickBar_Items::ResetVisuals() {
-    for( uint i = 0; i < Circles.GetNum(); i++ )
-      for( uint j = 0; j < Circles[i].GetNum(); j++ )
-        Circles[i][j].Item = Null;
+    for( uint i = 0; i < Rings.GetNum(); i++ )
+      for( uint j = 0; j < Rings[i].GetNum(); j++ )
+        Rings[i][j].Item = Null;
   }
 
 
 
   void zCGamepadQuickBar_Items::ResetInstances() {
-    for( uint i = 0; i < Circles.GetNum(); i++ )
-      for( uint j = 0; j < Circles[i].GetNum(); j++ )
-        Circles[i][j].InstanceID = Invalid;
+    for( uint i = 0; i < Rings.GetNum(); i++ )
+      for( uint j = 0; j < Rings[i].GetNum(); j++ )
+        Rings[i][j].InstanceID = Invalid;
   }
 
 
 
   Array<zTGamepadQuickBarCell*> zCGamepadQuickBar_Items::GetNotEmptyCells() {
     Array<zTGamepadQuickBarCell*> array;
-    for( uint i = 0; i < Circles.GetNum(); i++ )
-      for( uint j = 0; j < Circles[i].GetNum(); j++ )
-        if( Circles[i][j].InstanceID != Invalid )
-          array.Insert( &Circles[i][j] );
+    for( uint i = 0; i < Rings.GetNum(); i++ )
+      for( uint j = 0; j < Rings[i].GetNum(); j++ )
+        if( Rings[i][j].InstanceID != Invalid )
+          array.Insert( &Rings[i][j] );
 
     return array;
   }
@@ -548,9 +608,9 @@ namespace GOTHIC_ENGINE {
     int notEmptyCell_Count = (int)GetNotEmptyCells().GetNum();
     ar.WriteInt( "NotEmpryCell_Count", notEmptyCell_Count );
 
-    for( uint i = 0; i < Circles.GetNum(); i++ ) {
-      for( uint j = 0; j < Circles[i].GetNum(); j++ ) {
-        auto& cell = Circles[i][j];
+    for( uint i = 0; i < Rings.GetNum(); i++ ) {
+      for( uint j = 0; j < Rings[i].GetNum(); j++ ) {
+        auto& cell = Rings[i][j];
         if( cell.InstanceID != Invalid ) {
           auto symbol = parser->GetSymbol( cell.InstanceID );
           if( !symbol )
@@ -582,9 +642,9 @@ namespace GOTHIC_ENGINE {
       if( symbolID == Invalid )
         continue;
 
-      if( cellID[0] < Circles.GetNum() ) {
-        if( cellID[1] < Circles[cellID[0]].GetNum() ) {
-          auto& cell = Circles[cellID[0]][cellID[1]];
+      if( cellID[0] < Rings.GetNum() ) {
+        if( cellID[1] < Rings[cellID[0]].GetNum() ) {
+          auto& cell = Rings[cellID[0]][cellID[1]];
           cell.InstanceID = symbolID;
         }
       }

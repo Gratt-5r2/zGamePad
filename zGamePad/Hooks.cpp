@@ -52,6 +52,12 @@ namespace GOTHIC_ENGINE {
 
 
 
+  void Input_GetMousePosReal( float& x, float& y, float& z ) {
+    ((zCInput_Win32*)zinput->*Hook_GetMousePos)(x, y, z);
+  }
+
+
+
   // void zCCamera::PreRenderProcessing()
   void __fastcall zCCamera_PreRenderProcessing( zCCamera* _this, void* vt );
 
