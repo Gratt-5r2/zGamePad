@@ -22,31 +22,32 @@ namespace GOTHIC_ENGINE {
 
 
 
-#define	JOY_UP            ArrowUp
-#define	JOY_DOWN          ArrowDown
-#define	JOY_LEFT          ArrowLeft
-#define	JOY_RIGHT         ArrowRight
-#define	JOY_MENU          ButtonMenu
-#define	JOY_VIEW          ButtonView
-#define	JOY_LSTICK        ButtonLeftStick
-#define	JOY_RSTICK        ButtonRightStick
-#define	JOY_LB            ButtonL1   
-#define	JOY_RB            ButtonR1
-#define	JOY_A             ButtonA
-#define	JOY_B             ButtonB
-#define	JOY_X             ButtonX
-#define	JOY_Y             ButtonY
-#define	JOY_LSTICK_LOWUP  GameWalk
-#define	JOY_LSTICK_UP     GameForward
-#define	JOY_LSTICK_DOWN   GameBackward
-#define	JOY_LSTICK_LEFT   GameLeftStrafe
-#define	JOY_LSTICK_RIGHT  GameRightStrafe
-#define	JOY_RT            GamePunch
-#define	JOY_LT            GameParade
-#define	JOY_DPAD_FULL     ArrowPad_Full
-#define	JOY_DPAD_UPDOWN   ArrowPad_UpDown
-#define	JOY_LSTICK_FULL   LeftStick
-#define	JOY_RSTICK_FULL   RightStick
+#define	JOY_UP             ArrowUp
+#define	JOY_DOWN           ArrowDown
+#define	JOY_LEFT           ArrowLeft
+#define	JOY_RIGHT          ArrowRight
+#define	JOY_MENU           ButtonMenu
+#define	JOY_VIEW           ButtonView
+#define	JOY_LSTICK         ButtonLeftStick
+#define	JOY_RSTICK         ButtonRightStick
+#define	JOY_LB             ButtonL1   
+#define	JOY_RB             ButtonR1
+#define	JOY_A              ButtonA
+#define	JOY_B              ButtonB
+#define	JOY_X              ButtonX
+#define	JOY_Y              ButtonY
+#define	JOY_LSTICK_LOWUP   GameWalk
+#define	JOY_LSTICK_UP      GameForward
+#define	JOY_LSTICK_DOWN    GameBackward
+#define	JOY_LSTICK_LEFT    GameLeftStrafe
+#define	JOY_LSTICK_RIGHT   GameRightStrafe
+#define	JOY_RT             GamePunch
+#define	JOY_LT             GameParade
+#define	JOY_DPAD           ArrowPad_Full
+#define	JOY_UPDOWN         ArrowPad_UpDown
+#define	JOY_LEFTRIGHT      ArrowPad_LeftRight
+#define	JOY_LSTICK_FULL    LeftStick
+#define	JOY_RSTICK_FULL    RightStick
 
 
 
@@ -73,8 +74,9 @@ namespace GOTHIC_ENGINE {
     CHECKCODE( JOY_LSTICK_RIGHT );
     CHECKCODE( JOY_RT );
     CHECKCODE( JOY_LT );
-    CHECKCODE( JOY_DPAD_FULL );
-    CHECKCODE( JOY_DPAD_UPDOWN );
+    CHECKCODE( JOY_DPAD );
+    CHECKCODE( JOY_UPDOWN );
+    CHECKCODE( JOY_LEFTRIGHT );
     CHECKCODE( JOY_LSTICK_FULL );
     CHECKCODE( JOY_RSTICK_FULL );
 #undef CHECKCODE
@@ -325,6 +327,9 @@ namespace GOTHIC_ENGINE {
     CHECKCODE( Cond_OnSpellBook );
     CHECKCODE( Cond_IsPlayerTalking );
     CHECKCODE( Cond_InterfaceIsOpen );
+    CHECKCODE( Cond_HasLeftContainer );
+    CHECKCODE( Cond_UsesPicklock );
+    CHECKCODE( Cond_IsOnTrade );
 #undef CHECKCODE
     return Null;
   }

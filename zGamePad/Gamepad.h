@@ -102,10 +102,11 @@ namespace GOTHIC_ENGINE {
     GamePunch        = 1 << 21,
     GameParade       = 1 << 22,
 
-    ArrowPad_Full    = 1 << 25,
-    ArrowPad_UpDown  = 1 << 26,
-    LeftStick        = 1 << 27,
-    RightStick       = 1 << 28,
+    ArrowPad_Full      = 1 << 25,
+    ArrowPad_UpDown    = 1 << 26,
+    ArrowPad_LeftRight = 1 << 27,
+    LeftStick          = 1 << 28,
+    RightStick         = 1 << 29,
   };
 
   struct zTStickState {
@@ -146,6 +147,7 @@ namespace GOTHIC_ENGINE {
     void ParseControlsHelp( zTCombination& combination, string row );
     void ParseControlsStringName( string& stringName, string row );
     void ParseControlsStringText( string& stringName, string row );
+    void DisplayDisconnect();
     Array<zTCombination> KeyCombinations;
     zTVibrationMessage VibrationMessage;
   public:
@@ -164,6 +166,7 @@ namespace GOTHIC_ENGINE {
     bool HasToggledKeys( JOYKEY& keys );
     void GetStickStatesSquare( zTStickState& stateLeft, zTStickState& stateRight );
     void GetStickStatesCircle( zTStickState& stateLeft, zTStickState& stateRight );
+    ~zCXInputDevice();
   };
 
   zCXInputDevice XInputDevice;
@@ -204,6 +207,9 @@ namespace GOTHIC_ENGINE {
   bool Cond_OnSpellBook();
   bool Cond_IsPlayerTalking();
   bool Cond_InterfaceIsOpen();
+  bool Cond_HasLeftContainer();
+  bool Cond_UsesPicklock();
+  bool Cond_IsOnTrade();
 
 
 
@@ -221,12 +227,6 @@ namespace GOTHIC_ENGINE {
   static float GetScaleMultiplier() {
     float scale = 1.0f;
     Union.GetSysPackOption().Read( scale, "INTERFACE", "Scale" );
-    return scale;
-  }
-
-  static float GetStickSensitivity() {
-    float scale = 1.0f;
-    Union.GetSysPackOption().Read( scale, "ZGAMEPAD", "StickSensitivity", scale );
     return scale;
   }
 

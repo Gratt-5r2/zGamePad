@@ -1,4 +1,4 @@
-// Supported with union (c) 2020 Union team
+﻿// Supported with union (c) 2020 Union team
 // Union SOURCE file
 
 namespace GOTHIC_ENGINE {
@@ -45,6 +45,9 @@ namespace GOTHIC_ENGINE {
     Gamepad_SetStaticCondition( Cond_OnSpellBook );
     Gamepad_SetStaticCondition( Cond_IsPlayerTalking );
     Gamepad_SetStaticCondition( Cond_InterfaceIsOpen );
+    Gamepad_SetStaticCondition( Cond_HasLeftContainer );
+    Gamepad_SetStaticCondition( Cond_UsesPicklock );
+    Gamepad_SetStaticCondition( Cond_IsOnTrade );
   }
 
 
@@ -260,17 +263,52 @@ namespace GOTHIC_ENGINE {
 #endif
 
     bool mainConditions =
-      Cond_IsDialogTop() ||
-      Cond_IsDocumentTop() ||
-      Cond_IsOverlayTop() ||
-      Cond_IsMenuTop() ||
-      Cond_OnSpellBook() ||
+      Cond_IsDialogTop()     ||
+      Cond_IsDocumentTop()   ||
+      Cond_IsOverlayTop()    ||
+      Cond_IsMenuTop()       ||
+      Cond_OnSpellBook()     ||
       Cond_IsPlayerTalking() ||
-      Cond_OnChooseWeapon();
+      Cond_OnChooseWeapon()  ||
+      Cond_UsesPicklock();
 
     bool otherConditions =
       !Cond_InventoryIsOpen();
 
     return mainConditions && otherConditions;
+  }
+
+
+
+  bool Cond_HasLeftContainer() {
+    auto list = oCItemContainer::contList.GetNextInList();
+    while( list ) {
+      auto con = list->GetData();
+      if( con->IsOpen() && con->posx == 0 )
+        return true;
+
+      list = list->GetNextInList();
+    }
+
+    return false;
+  }
+
+
+
+  bool Cond_UsesPicklock() {
+    if( !player )
+      return false;
+
+    oCMobLockable* mobLockable = player->interactMob->CastTo<oCMobLockable>();
+    if( !mobLockable )
+      return false;
+
+    return mobLockable->locked;
+  }
+
+
+
+  bool Cond_IsOnTrade() {
+    return player && oCInformationManager::GetInformationManager().Mode == oCInformationManager::INFO_MGR_MODE_TRADE;
   }
 }

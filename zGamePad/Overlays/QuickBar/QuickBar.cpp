@@ -14,8 +14,8 @@ namespace GOTHIC_ENGINE {
     ItemRenderer->SetFont( "FONT_OLD_20_WHITE.TGA" );
     Foreground = new zCView( 0, 0, 8192, 8192 );
     Foreground->SetFont( "FONT_OLD_10_WHITE.TGA" );
-    Foreground->SetAlphaBlendFunc( zRND_ALPHA_FUNC_ADD );
-    Foreground->SetTransparency( 210 );
+    Foreground->SetAlphaBlendFunc( zRND_ALPHA_FUNC_BLEND );
+    Foreground->SetTransparency( 150 );
     Foreground->InsertBack( "SPELLBOOK_AMOUNT.TGA" );
   }
 
@@ -30,7 +30,7 @@ namespace GOTHIC_ENGINE {
   void zTGamepadQuickBarCell::SetViewport( const int& px, const int& py, const int& sx, const int& sy ) {
     ItemRenderer->SetPos( px, py );
     ItemRenderer->SetSize( sx, sy );
-    Foreground->SetPos( px, py + sy / 2 );
+    Foreground->SetPos( px, py + sy / 3 );
     Foreground->SetSize( sx, sy );
   }
 
@@ -39,9 +39,9 @@ namespace GOTHIC_ENGINE {
 
 
   zCGamepadQuickBar::zCGamepadQuickBar() : zCGamepadOverlay() {
-    Alignment     = zEGamepadQuickBarAlignment_Right;
+    Alignment  = zEGamepadQuickBarAlignment_Right;
     LastRingID = Invalid;
-    LastCellID   = Invalid;
+    LastCellID = Invalid;
     SetFont( "FONT_OLD_20_WHITE.TGA" );
     NeedToMarkEquipedItems = false;
   }
@@ -98,21 +98,24 @@ namespace GOTHIC_ENGINE {
 
   static Array<float> QuickBar_ReadOffsets() {
     Array<float> offsets;
-    string QuickSlots_Option = "1.3, 1.0";
-    Union.GetSysPackOption().Read( QuickSlots_Option, "zGamePad", "QuickBar_Offsets", QuickSlots_Option );
-    QuickSlots_Option.Regex_Replace( "\\s", "" );
-    Array<string> tokens = QuickSlots_Option.Split( "," );
+    string QuickSlots_Offset = Opt_QuickBar_Offsets;
+    QuickSlots_Offset.Regex_Replace( "\\s", "" );
+    Array<string> tokens = QuickSlots_Offset.Split( "," );
     for( uint i = 0; i < tokens.GetNum(); i++ )
       offsets += tokens[i].ToReal32();
     
     return offsets;
   }
 
-  static Array<string> QuickBar_ReadCounts() {
-    string QuickSlots_Option = "2, 7";
-    Union.GetSysPackOption().Read( QuickSlots_Option, "zGamePad", "QuickBar_Counts", QuickSlots_Option );
+  static Array<uint> QuickBar_ReadCounts() {
+    Array<uint> counts;
+    string QuickSlots_Option = Opt_QuickBar_Counts;
     QuickSlots_Option.Regex_Replace( "\\s", "" );
-    return QuickSlots_Option.Split( "," );
+    Array<string> tokens = QuickSlots_Option.Split( "," );
+    for( uint i = 0; i < tokens.GetNum(); i++ )
+      counts += tokens[i].ToInt32();
+
+    return counts;
   }
 
 
@@ -129,14 +132,15 @@ namespace GOTHIC_ENGINE {
         continue;
 
       float anglePerCell = RAD360 / (float)cellsNum;
-      zVEC2 itemPosition( 0.0f, distancePerRing * (i + 1) - distancePerRing / 2 );
+      uint itemDistance  = distancePerRing * (i + 1) - distancePerRing / 2;
+      zVEC2 itemPosition = zVEC2( 0.0f, (float)itemDistance );
       itemPosition.Rotate( anglePerCell * 0.5f );
 
       for( uint j = 0; j < cellsNum; j++ ) {
         auto& cell = Rings[i][j];
-        int itemRendererSize = distancePerRing * 75 / 100; // (int)((float)distancePerRing * 0.75f);
-        cell.SetViewport( 4096 + itemPosition[VX] * cell.Offset - itemRendererSize / 2,
-                          4096 - itemPosition[VY] * cell.Offset - itemRendererSize / 2,
+        int itemRendererSize = distancePerRing * 75 / 100;
+        cell.SetViewport( 4096 + (int)(itemPosition[VX] * cell.Offset) - itemRendererSize / 2,
+                          4096 - (int)(itemPosition[VY] * cell.Offset) - itemRendererSize / 2,
                           itemRendererSize,
                           itemRendererSize );
 
@@ -204,10 +208,8 @@ namespace GOTHIC_ENGINE {
 
       stickVector += MouseState;
     }
-    else {
+    else
       MouseState = 0.0f;
-      cmd << StickStateRight.Length() << endl;
-    }
 
     // Accent to the more comfortable selection of
     // center rings. Range of collisions in center in
@@ -233,7 +235,7 @@ namespace GOTHIC_ENGINE {
     // Current cell by stick angle
     float anglePerCell = RAD360 / (float)ring.GetNum();
     float angle = stickVector.GetAngle();
-    cellID = angle / RAD360 * ((float)ring.GetNum());
+    cellID = (uint)(angle / RAD360 * (float)ring.GetNum());
     LastCellID = cellID;
   }
 
@@ -514,8 +516,8 @@ namespace GOTHIC_ENGINE {
   string zCGamepadQuickBar_Weapons::GetDescription() {
     switch( Union.GetSystemLanguage() ) {
       case Lang_Rus: return (W L"Магия и оружия").     WToA( ANSI_CODEPAGE_CYRILLIC );
-      case Lang_Deu: return (W L"Magie und Waffen").   WToA( ANSI_COPEDAGE_NORTHORWESTERN_EUROPEAN );
-      case Lang_Pol: return (W L"Magia i broń").       WToA( ANSI_COPEDAGE_CENTRALOREASTERN_EUROPEAN );
+      case Lang_Ger: return (W L"Magie und Waffen").   WToA( ANSI_COPEDAGE_NORTHORWESTERN_EUROPEAN );
+      case Lang_Pol: return (W L"Magia i bronie").     WToA( ANSI_COPEDAGE_CENTRALOREASTERN_EUROPEAN );
       default:       return (W L"Magic and weapons" ). WToA( ANSI_COPEDAGE_NORTHORWESTERN_EUROPEAN );
     }
   }
@@ -536,19 +538,17 @@ namespace GOTHIC_ENGINE {
 
 
   zCGamepadQuickBar_Items::zCGamepadQuickBar_Items() : zCGamepadQuickBar() {
-    Array<string> counts = QuickBar_ReadCounts();
+    Array<uint> counts = QuickBar_ReadCounts();
     Array<float> offsets = QuickBar_ReadOffsets();
 
     for( uint i = 0; i < counts.GetNum(); i++ ) {
-      uint numInRing = counts[i].ToInt32();
+      uint numInRing = counts[i];
       float offset = i < offsets.GetNum() ? offsets[i] : 1.0f;
       for( uint j = 0; j < numInRing; j++ )
         PushItem( Null, i ).Offset = offset;
     }
 
-    string QuickSlots_TextureBase = "QUICKSLOT";
-    Union.GetSysPackOption().Read( QuickSlots_TextureBase, "zGamePad", "QuickBar_TextureBase", QuickSlots_TextureBase );
-    SetBaseTextureName( QuickSlots_TextureBase );
+    SetBaseTextureName( Opt_QuickBar_TextureBase );
     NeedToMarkEquipedItems = true;
   }
 
@@ -616,7 +616,7 @@ namespace GOTHIC_ENGINE {
           if( !symbol )
             continue;
 
-          int cellID[] = { i, j };
+          uint cellID[] = { i, j };
           ar.WriteRaw( "CellID", cellID, 8 );
           ar.WriteString( "InstanceName", symbol->name );
         }
@@ -634,7 +634,7 @@ namespace GOTHIC_ENGINE {
     ar.ReadInt( "NotEmpryCell_Count", notEmptyCell_Count );
 
     for( uint i = 0; i < (uint&)notEmptyCell_Count; i++ ) {
-      int cellID[] = { 0, 0 };
+      uint cellID[] = { 0, 0 };
       zSTRING symbolName;
       ar.ReadRaw( "CellID", cellID, 8 );
       ar.ReadString( "InstanceName", symbolName );
@@ -667,10 +667,10 @@ namespace GOTHIC_ENGINE {
 
   string zCGamepadQuickBar_Items::GetDescription() {
     switch( Union.GetSystemLanguage() ) {
-      case Lang_Rus: return (W L"Предметы").    WToA( ANSI_CODEPAGE_CYRILLIC );
-      case Lang_Deu: return (W L"Artikel").     WToA( ANSI_COPEDAGE_NORTHORWESTERN_EUROPEAN );
-      case Lang_Pol: return (W L"Przedmiotów"). WToA( ANSI_COPEDAGE_CENTRALOREASTERN_EUROPEAN );
-      default:       return (W L"Items" ).      WToA( ANSI_COPEDAGE_NORTHORWESTERN_EUROPEAN );
+      case Lang_Rus: return (W L"Предметы").   WToA( ANSI_CODEPAGE_CYRILLIC );
+      case Lang_Ger: return (W L"Artikel").    WToA( ANSI_COPEDAGE_NORTHORWESTERN_EUROPEAN );
+      case Lang_Pol: return (W L"Przedmioty"). WToA( ANSI_COPEDAGE_CENTRALOREASTERN_EUROPEAN );
+      default:       return (W L"Items" ).     WToA( ANSI_COPEDAGE_NORTHORWESTERN_EUROPEAN );
     }
   }
 

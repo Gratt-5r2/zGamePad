@@ -6,6 +6,7 @@ namespace GOTHIC_ENGINE {
   }
 
   void Game_Init() {
+    ApplyGamepadOptions();
   }
 
   void Game_Exit() {
@@ -20,25 +21,6 @@ namespace GOTHIC_ENGINE {
     }
    
     return "...";
-  }
-
-
-  // DELETE ME
-  void ShowStickPosition() {
-    static zCView* stick = Null;
-    if( !stick ) {
-      // PS_RS.TGA
-      stick = new zCView();
-      screen->InsertItem( stick );
-      stick->InsertBack( "PS_RS.TGA" );
-      stick->SetSize( zPixelX( 100 ), zPixelY( 100 ) );
-    }
-
-    static zTStickState stickStateLeft, stickStateRight;
-    XInputDevice.GetStickStatesCircle( stickStateLeft, stickStateRight );
-    // XInputDevice.GetStickStatesSquare( stickStateLeft, stickStateRight );
-    zVEC2 vector = zVEC2( stickStateLeft.X, stickStateLeft.Y );
-    stick->SetPos( 4192 + zPixelX( stickStateLeft.X / 100 ), 4192 + zPixelY( stickStateLeft.Y / -100 ) );
   }
 
 

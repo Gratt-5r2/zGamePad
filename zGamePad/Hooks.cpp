@@ -21,7 +21,6 @@ namespace GOTHIC_ENGINE {
   HOOK Hook_GetMousePos PATCH_IF( &zCInput_Win32::GetMousePos, &zCInput_Win32::GetMousePos_Union, false );
 
   void zCInput_Win32::GetMousePos_Union( float& x, float& y, float& z ) {
-    static float stickSensitivity = GetStickSensitivity();
     static float rollbackSensitivity = 1.0f;
     if( zCGamepadQuickBar::OverlayMouseHooksCount > 0 ) {
       x = 0.0f;
@@ -32,8 +31,8 @@ namespace GOTHIC_ENGINE {
     }
 
     THISCALL( Hook_GetMousePos )(x, y, z);
-    x += ((float)XInputDevice.RightStick.X) / 3000.0f * stickSensitivity;
-    y += ((float)XInputDevice.RightStick.Y) / -3000.0f * stickSensitivity;
+    x += ((float)XInputDevice.RightStick.X) /  3000.0f * Opt_StickSensitivity;
+    y += ((float)XInputDevice.RightStick.Y) / -3000.0f * Opt_StickSensitivity;
 
     if( rollbackSensitivity < 1.0f ) {
       if( abs( x + y ) > 0.3f ) {
@@ -131,10 +130,9 @@ namespace GOTHIC_ENGINE {
 
   void CGameManager::ApplySomeSettings_Union() {
     THISCALL( Hook_CGameManager_ApplySomeSettings) ();
+    ApplyGamepadOptions();
     XInputDevice.UpdateControls();
   }
-
-
 
 
 
@@ -148,37 +146,28 @@ namespace GOTHIC_ENGINE {
     return False;
   }
 
-#if 0
-  int oCAIHuman::Pressed_Union( int key ) {
-    if( key == GAME_ACTION ) {
-      if( !LogicalKeyPressed( GAME_UP ) )
-        if( IsStateAniActive( _t_hitf ) || IsStateAniActive( _t_hitl ) || IsStateAniActive( _t_hitr ) )
-          return True;
-    }
-
-    return False;
-
-    /*if( key == GAME_ACTION )
-      if( !Pressed( GAME_UP ) && !Pressed( GAME_LEFT ) && !Pressed( GAME_RIGHT ) && !Pressed( GAME_STRAFELEFT ) && !Pressed( GAME_STRAFERIGHT ) )
-        if( IsStateAniActive( _t_hitf ) || IsStateAniActive( _t_hitl ) || IsStateAniActive( _t_hitr ) )
-          return True;
-
-    return False;*/
-  }
-#endif
 
 
   int oCAIHuman::IsOnFightAni() {
     return
-      //IsStateAniActive( _t_hitf ) ||
+#if ENGINE < Engine_G2
+      !LogicalKeyPressed( GAME_UP ) &&
+      ( IsStateAniActive( _t_hitf ) ||
+        IsStateAniActive( _t_hitl ) ||
+        IsStateAniActive( _t_hitr ) );
+#else
       IsStateAniActive( _t_hitl ) ||
       IsStateAniActive( _t_hitr );
+#endif
   }
 
 
-#if 1
   HOOK Hook_zCInput_Win32_GetState PATCH( &zCInput_Win32::GetState, &zCInput::GetState_Union );
 
+  // For combo not interupted after key up,
+  // need to check fight animations and
+  // motion key states. Combo can be continue
+  // if player dont use fight modifier buttons.
   inline bool IsMovementKeyPressed() {
     return
       LogicalKeyPressed( GAME_UP )   ||
@@ -196,50 +185,25 @@ namespace GOTHIC_ENGINE {
     }
 
     return THISCALL( Hook_zCInput_Win32_GetState )(key);
-
-#if 0
-    float OK = THISCALL( Hook_zCInput_Win32_GetState )(key);
-
-    if( key == GAME_ACTION ) {
-      if( player->human_ai->IsOnFightAni() )
-        if( !IsMovementKeyPressed() && !LogicalKeyPressed( GAME_PARADE ) )
-          return True;
-
-      /*if( LogicalKeyPressed( GAME_DOWN ) && LogicalKeyPressed( GAME_ACTION ) )
-        return True;
-
-      if( player && player->human_ai )
-        if( !IsMovementKeyPressed() && player->human_ai->IsOnFightAni() )
-          return True;*/
-    }
-
-    return OK;
-#endif
-
-    //if( key == GAME_ACTION && 0 ) {
-    //  if( player && player->human_ai ) {
-    //    if( player->human_ai->Pressed_Union( key ) )
-    //      return True;
-    //  }
-    //  //else
-    //  //  return True;
-    //}
-
-    //return THISCALL( Hook_zCInput_Win32_GetState )(key);
   }
-#endif
 
 
 
   HOOK Hook_oCNpcInventory_HandleEvent PATCH( &oCNpcInventory::HandleEvent, &oCNpcInventory::HandleEvent_Union );
 
+  // Including quick br actions to Inventory.
+  // You can place all items in bar by KEY_3
+  // button and delete by KEY_DELETE.
   int oCNpcInventory::HandleEvent_Union( int key ) {
-    auto itemsCircle = zCGamepadQuickBar_Items::GetInstance();
+    auto itemsRing = zCGamepadQuickBar_Items::GetInstance();
     static bool waitingSlotID = false;
 
-    if( key == KEY_COMMA ) {
-      itemsCircle->ShowAt( screen, zEGamepadQuickBarAlignment_Center );
-      waitingSlotID = true;
+    if( key == KEY_3 ) {
+      if( owner == player && !Gamepad_GetStaticCondition( Cond_HasLeftContainer ) ) {
+        itemsRing->ShowAt( screen, zEGamepadQuickBarAlignment_Center );
+        waitingSlotID = true;
+      }
+      
       return True;
     }
 
@@ -249,16 +213,40 @@ namespace GOTHIC_ENGINE {
       
       if( key == KEY_RETURN || key == KEY_LCONTROL || key == MOUSE_BUTTONLEFT ) {
         oCItem* item = GetSelectedItem();
-        itemsCircle->SetItemInActiveCell( item );
+        itemsRing->SetItemInActiveCell( item );
         waitingSlotID = false;
       }
 
       if( key == KEY_DELETE )
-        itemsCircle->SetItemInActiveCell( Null );
+        itemsRing->SetItemInActiveCell( Null );
 
       return True;
     }
 
     return THISCALL( Hook_oCNpcInventory_HandleEvent )(key);
+  }
+
+
+
+  HOOK Hook_oCNpc_CanDrawWeapon PATCH( &oCNpc::CanDrawWeapon, &oCNpc::CanDrawWeapon_Union );
+
+  // Check current body state and ready-spell
+  // in hand. If player change spell to spell -
+  // he can do it from all body states. Condition
+  // is true if ForceDrawMagic is true too.
+  int oCNpc::CanDrawWeapon_Union() {
+    if( ForceDrawMagic ) {
+      if( player->HasMagic() && player->GetWeaponMode() == NPC_WEAPON_MAG )
+        return True;
+
+      if( player->anictrl->state != zCAIPlayer::zMV_STATE_STAND ) {
+        ogame->GetTextView()->Printwin( Opt_UseItemError );
+        return False;
+      }
+
+      return True;
+    }
+
+    return THISCALL( Hook_oCNpc_CanDrawWeapon )();
   }
 }

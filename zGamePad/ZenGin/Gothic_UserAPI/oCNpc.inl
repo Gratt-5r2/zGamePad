@@ -12,6 +12,7 @@ void CreateVobList_Union( float max_dist );
 
 void GetNearestValidVob_Union( float max_dist );
 void GetNearestVob_Union( float max_dist );
+int CanDrawWeapon_Union();
 // void CollectFocusVob_Union( const int a_bForce );
 
 #if ENGINE < Engine_G2
@@ -27,3 +28,7 @@ oCNpc* oCNpc::GetNearestFightNpcRight_Union();
 oCNpc* oCNpc::GetNearestFightNpcLeft_Union();
 oCNpc* oCNpc::GetNearestFightNpc_Union();
 int CanInterruptAttack();
+
+#if ENGINE == Engine_G2
+int IsDead() { return attribute[NPC_ATR_HITPOINTS] <= 0; }
+#endif

@@ -83,9 +83,9 @@ namespace GOTHIC_ENGINE {
 		SetSize( 8192, 8192 );
 		IsOpened = True;
 
-		SetSelectedMenu( zKeyPressed( KEY_LSHIFT ) ? Childs.GetNum() - 1 : 0 );
+		SetSelectedMenu( zKeyToggled( MOUSE_UP ) ? Childs.GetNum() - 1 : 0 );
 
-		int itemsCount			= Selectors.GetNum();
+		uint itemsCount			= Selectors.GetNum();
 		int itemSizeY				= FontY() * 2;
 		int itemSizeY_Total = itemSizeY * itemsCount;
 		int itemPosY_Start  = 4196 - itemSizeY_Total / 2;
@@ -175,6 +175,13 @@ namespace GOTHIC_ENGINE {
 
 	
 
+
+
+	// Can or not change spell in other actions.
+	// For example if need to swap spells in
+	// hand - player can did it from all body states.
+	static bool ForceDrawMagic = false;
+
 	static bool CheckOverlayMagBook( zCGamepadOverlay* overlay ) {
 		zCGamepadQuickBar_Weapons* quickBar_magBook = dynamic_cast<zCGamepadQuickBar_Weapons*>(overlay);
 		if( quickBar_magBook != Null ) {
@@ -183,11 +190,12 @@ namespace GOTHIC_ENGINE {
 			uint keyToggled = (circleID == 0 ? KEY_1 : KEY_4) + cellID;
 
 			if( circleID != Invalid && cellID != Invalid ) {
+				ForceDrawMagic = keyToggled >= KEY_4;
 				zinput->SetKey( keyToggled, True );
 				ogame->HandleEvent( keyToggled );
 				zinput->SetKey( keyToggled, False );
+				ForceDrawMagic = false;
 			}
-
 			return true;
 		}
 
@@ -200,8 +208,10 @@ namespace GOTHIC_ENGINE {
 		if( !npc || !item )
 			return;
 
-		if( npc->anictrl->state != zCAIPlayer::zMV_STATE_STAND )
+		if( npc->anictrl->state != zCAIPlayer::zMV_STATE_STAND ) {
+			ogame->GetTextView()->Printwin( Opt_UseItemError );
 			return;
+		}
 
 		oCMsgMovement* standUp = new oCMsgMovement( oCMsgMovement::EV_STANDUP, 0 );
 		oCMsgWeapon* removeWeaponMsg = new oCMsgWeapon( oCMsgWeapon::EV_REMOVEWEAPON, 0, 0 );

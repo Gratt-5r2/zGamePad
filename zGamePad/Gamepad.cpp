@@ -484,20 +484,30 @@ namespace GOTHIC_ENGINE {
 
 
 
-  int GetGamepadID() {
-    int gamepadID = 0;
-    Union.GetSysPackOption().Read( gamepadID, "ZGAMEPAD", "ControllerID", gamepadID );
-    return min( 3, max( 0, gamepadID ) );
+  void zCXInputDevice::DisplayDisconnect() {
+    static zCMenu* menu = Null;
+    if( menu == Null ) {
+      menu = zCMenu::Create( "ZGAMEPAD_MENU_DISCONNECTED" );
+      if( menu ) {
+        ogame->Pause();
+        menu->Run();
+        menu->Release();
+        ogame->Unpause();
+        menu = Null;
+      }
+    }
   }
 
 
 
   void zCXInputDevice::UpdateKeyState() {
-    static int gamepadID = GetGamepadID();
     if( !zinput )
       return;
 
-    if( XINPUTGETSTATE( gamepadID, &Gamepad ) == ERROR_DEVICE_NOT_CONNECTED ) {
+    if( XINPUTGETSTATE( Opt_ControllerID, &Gamepad ) == ERROR_DEVICE_NOT_CONNECTED ) {
+      if( DeviceConnected )
+        DisplayDisconnect();
+
       DeviceConnected = false;
       return;
     }
@@ -510,6 +520,30 @@ namespace GOTHIC_ENGINE {
     if( ForceVideoSkipping() || !ogame )
      return;
 
+    if( !Opt_GamepadEnabled )
+      return;
+
+#if 0
+    static uint lastBattery    = 0;
+           uint currentbattery = GetBatteryLevel();
+
+    if( currentbattery == 0 && lastBattery > 0 ) {
+      static zCMenu* menu = Null;
+      if( menu == Null ) {
+        menu = zCMenu::Create( "ZGAMEPAD_MENU_DISCONNECTED" );
+        if( menu ) {
+          ogame->Pause();
+          menu->Run();
+          menu->Release();
+          ogame->Unpause();
+          menu = Null;
+        }
+      }
+    }
+
+    lastBattery = currentbattery;
+#endif
+
     // Important: Update a statick condition
     // information for the faster access !!!
     Gamepad_UpdateStaticConditions();
@@ -517,7 +551,9 @@ namespace GOTHIC_ENGINE {
     for( uint i = 0; i < KeyCombinations.GetNum(); i++ )
       KeyCombinations[i].CheckDisable( KeyStates );
     
-    // if( KeyStates ) // For help marks this line is commented
+    // For correclty hints drawing this
+    // condition should be always true
+    if( KeyStates || Opt_HintsEnabled )
       for( uint i = 0; i < KeyCombinations.GetNum(); i++ )
         KeyCombinations[i].CheckEnable( KeyStates );
 
@@ -555,14 +591,14 @@ namespace GOTHIC_ENGINE {
   void zCXInputDevice::StartVibration( string ptr ) {
     VibrationMessage.Index = 0;
     VibrationMessage.Pattern = ptr;
-    VibrationMessage.Timer[0u];
+    VibrationMessage.Timer[0u].Delete();
   }
 
 
 
   uint zCXInputDevice::GetBatteryLevel() {
     XINPUT_BATTERY_INFORMATION batteryInformation;
-    if( !XINPUTGETBATTERYINFORMATION( GetGamepadID(), BATTERY_DEVTYPE_GAMEPAD, &batteryInformation ) != ERROR_SUCCESS )
+    if( !XINPUTGETBATTERYINFORMATION( Opt_ControllerID, BATTERY_DEVTYPE_GAMEPAD, &batteryInformation ) != ERROR_SUCCESS )
       /*return BATTERY_LEVEL_FAKE*/;
 
     return batteryInformation.BatteryLevel;
@@ -617,5 +653,12 @@ namespace GOTHIC_ENGINE {
     squareY = double( RightStick.Y ) / STICK_MAX_D;
     stateRight.X = int( squareX * sqrt( 1.0 - pow( squareY, 2 ) * 0.5 ) * STICK_MAX_D );
     stateRight.Y = int( squareY * sqrt( 1.0 - pow( squareX, 2 ) * 0.5 ) * STICK_MAX_D );
+  }
+
+
+
+  zCXInputDevice::~zCXInputDevice() {
+    StartVibration("0");
+    UpdateVibration();
   }
 }

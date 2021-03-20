@@ -36,25 +36,10 @@ namespace GOTHIC_ENGINE {
 
 
 
-
-
-
-
-
-
-
-
-
-
-
-
-
   zCGamepadControlsHelp::zCGamepadControlsHelp() {
-    static int alpha = GetHintsTransparency();
-    Show( ogame->viewport );
+    Show( screen );
     Background = new zCView();
     Background->SetFont( screen->GetFontName() );
-    Background->fontColor.alpha = alpha;
     SetFont( screen->GetFontName() );
   }
 
@@ -84,9 +69,17 @@ namespace GOTHIC_ENGINE {
 
 
   void zCGamepadControlsHelp::Blit() {
-    static bool hintsEnabled = GetHintsEnabled();
-    if( !hintsEnabled )
+    if( !Opt_GamepadEnabled || !Opt_HintsEnabled || !XInputDevice.IsConnected() )
       return;
+
+    int startPosX = 8192;
+#if ENGINE < Engine_G2
+    if( player->inventory2.IsOpen() ) {
+      int sx, sy;
+      player->inventory2.GetSize( sx, sy );
+      startPosX = 8192 - (int)((float)sx * CalculateInterfaceScale()) - 100;
+    }
+#endif
 
     InsertItem( Background );
 
@@ -98,21 +91,20 @@ namespace GOTHIC_ENGINE {
       if( !help->Enabled )
         continue;
 
-      static float iconScale = GetHintsIconScale();
-
       zSTRING text = help->Text;
       int fontX    = FontSize( text );
-      int fontY    = (int)((float)FontY() * iconScale);
+      int fontY    = (int)((float)FontY() * Opt_HintsIconScale);
       int spriteSY = fontY;
       int spriteSX = anx( nay( fontY ) );
       uint keysNum = help->Keys.GetNum();
       int backSX   = fontX;
       int backSY   = fontY;
-      int backPX   = 8192 - fontX - spriteSX * (int&)keysNum;
+      int backPX   = startPosX - fontX - spriteSX * (int&)keysNum;
       int backPY   = 7200 - fontY * e++;
 
       Background->ClrPrintwin();
       Background->SetSize( backSX, backSY );
+      Background->fontColor.alpha = Opt_HintsTransparency;
       Background->PrintCXY( text );
       Background->SetPos( backPX, backPY );
       Background->Blit();
@@ -126,6 +118,7 @@ namespace GOTHIC_ENGINE {
         sprite->SetPos( backPX + backSX + spriteSX * k, backPY );
         sprite->SetSize( spriteSX, spriteSY );
         sprite->Blit();
+        sprite->SetTransparency( Opt_HintsTransparency );
         RemoveItem( sprite );
       }
     }

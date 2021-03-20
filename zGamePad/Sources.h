@@ -3,6 +3,7 @@
 
 // Automatically generated block
 #pragma region Includes
+#include "Options.cpp"
 #include "Conditions.cpp"
 #include "Overlays/GamepadOverlay.cpp"
 #include "Overlays/QuickBar/QuickBar.cpp"

@@ -3,6 +3,7 @@
 
 // Automatically generated block
 #pragma region Includes
+#include "Options.h"
 #include "Gamepad.h"
 #include "ControlParser.h"
 #include "Overlays/GamepadOverlay.h"

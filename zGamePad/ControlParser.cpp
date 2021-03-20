@@ -88,21 +88,6 @@ namespace GOTHIC_ENGINE {
 
 
 
-
-
-
-  COption& GetOptions() {
-    COption& defaultOptions = Union.GetDefaultOption();
-    COption& gameOptions = Union.GetGameOption();
-    COption& sysPackOptions = Union.GetSysPackOption();
-
-    return &defaultOptions == &gameOptions ?
-      sysPackOptions :
-      gameOptions;
-  }
-
-
-
   void zCXInputDevice::ParseControlsCombination( zTCombination& combination, string row ) {
     for( uint i = 2; true; i++ ) {
       string token = row.GetWordSmart( i );
@@ -251,19 +236,16 @@ namespace GOTHIC_ENGINE {
 
   bool zCXInputDevice::ParseControlFile() {
     // Check external control file
-    string defaultControlsFileName = "Controls.Gamepad";
-    string controlsFileName;
-    GetOptions().Read( controlsFileName, "zGamePad", "ControlsFile", defaultControlsFileName );
-
-    if( controlsFileName.IsEmpty() )
-      controlsFileName = defaultControlsFileName;
+    zSTRING defaultControlsFileName = "Controls.Gamepad";
+    if( Opt_ControlsFile.IsEmpty() )
+      Opt_ControlsFile = defaultControlsFileName;
 
     bool initialized = false;
     zTCombination combination;
     string currentStringName;
 
     string controlsFile;
-    if( !controlsFile.ReadFromVdf( controlsFileName, VDF_DEFAULT | VDF_PHYSICALFIRST ) ) {
+    if( !controlsFile.ReadFromVdf( Opt_ControlsFile, VDF_DEFAULT | VDF_PHYSICALFIRST ) ) {
       cmd << "Controls not found" << endl;
       return false;
     }

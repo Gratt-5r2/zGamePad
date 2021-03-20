@@ -3,15 +3,12 @@
 
 namespace GOTHIC_ENGINE {
   zCCombination_SpriteList::zTSprite::zTSprite( const string& xboxTex, const string& psTex ) {
-    static int alpha =  GetHintsTransparency();
     XBOX = new zCView();
     PS = new zCView();
     XBOX->InsertBack( xboxTex );
     PS->InsertBack( psTex );
     XBOX->SetAlphaBlendFunc( zRND_ALPHA_FUNC_BLEND );
     PS->SetAlphaBlendFunc( zRND_ALPHA_FUNC_BLEND );
-    XBOX->SetTransparency( alpha );
-    PS->SetTransparency( alpha );
   }
 
 
@@ -29,8 +26,6 @@ namespace GOTHIC_ENGINE {
 
 
   void zCCombination_SpriteList::Initialize() {
-    Union.GetSysPackOption().Read( ControllerScheme, "zGamePad", "ControllerScheme", 0 );
-
     SpriteList.Insert( JOY_UP,           new zTSprite( "XboxOne_Dpad_Up",           "PS4_Dpad_Up"           ) );
     SpriteList.Insert( JOY_DOWN,         new zTSprite( "XboxOne_Dpad_Down",         "PS4_Dpad_Down"         ) );
     SpriteList.Insert( JOY_LEFT,         new zTSprite( "XboxOne_Dpad_Left",         "PS4_Dpad_Left"         ) );
@@ -52,8 +47,9 @@ namespace GOTHIC_ENGINE {
     SpriteList.Insert( JOY_LSTICK_RIGHT, new zTSprite( "XboxOne_Left_Stick",        "PS4_Left_Stick"        ) );
     SpriteList.Insert( JOY_LT,           new zTSprite( "XboxOne_LT",                "PS4_L2"                ) );
     SpriteList.Insert( JOY_RT,           new zTSprite( "XboxOne_RT",                "PS4_R2"                ) );
-    SpriteList.Insert( JOY_DPAD_FULL,    new zTSprite( "XboxOne_Dpad",              "PS4_Dpad"              ) );
-    SpriteList.Insert( JOY_DPAD_UPDOWN,  new zTSprite( "XboxOne_Dpad_UpDown",       "PS4_Dpad_UpDown"       ) );
+    SpriteList.Insert( JOY_DPAD,         new zTSprite( "XboxOne_Dpad",              "PS4_Dpad"              ) );
+    SpriteList.Insert( JOY_UPDOWN,       new zTSprite( "XboxOne_Dpad_UpDown",       "PS4_Dpad_UpDown"       ) );
+    SpriteList.Insert( JOY_LEFTRIGHT,    new zTSprite( "XboxOne_Dpad_LeftRight",    "PS4_Dpad_LeftRight"    ) );
     SpriteList.Insert( JOY_LSTICK_FULL,  new zTSprite( "XboxOne_Left_Stick",        "PS4_Left_Stick"        ) );
     SpriteList.Insert( JOY_RSTICK_FULL,  new zTSprite( "XboxOne_Right_Stick",       "PS4_Right_Stick"       ) );
   }
@@ -65,7 +61,7 @@ namespace GOTHIC_ENGINE {
     if( pair.IsNull() )
       return Null;
 
-    return pair.GetValue()->GetSprite( ControllerScheme );
+    return pair.GetValue()->GetSprite( Opt_ControllerScheme );
   }
 
 

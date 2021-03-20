@@ -1,6 +1,7 @@
 META
 {
   Parser = Menu;
+  After = zUnionMenu.d;
 };
 
 instance MENUITEM_UNION_AUTO_ZGAMEPAD(C_MENU_ITEM_UNION)
@@ -33,8 +34,8 @@ instance MENU_OPT_ZGAMEPAD(C_MENU_DEF)
 	items[12] = "MENUITEM_ZGAMEPAD_HINTS_SCALE_SLIDER";
 	items[13] = "MENUITEM_ZGAMEPAD_HINTS_TRANSPARENCY";
 	items[14] = "MENUITEM_ZGAMEPAD_HINTS_TRANSPARENCY_SLIDER";
-	items[15] = "MENUITEM_ZGAMEPAD_HINTS_TRANSPARENCY";
-	items[16] = "MENUITEM_ZGAMEPAD_BACK";
+	items[16] = "MENUITEM_ZGAMEPAD_OPEN_LINK";
+	items[17] = "MENUITEM_ZGAMEPAD_BACK";
 	flags = flags | MENU_SHOW_INFO;
 };
 
@@ -118,7 +119,7 @@ instance MENUITEM_ZGAMEPAD_GAMEPAD_ID_CHOICE(C_MENU_ITEM_DEF)
 instance MENUITEM_ZGAMEPAD_SENSITIVITY(C_MENU_ITEM_DEF)
 {
 	backpic = MENU_ITEM_BACK_PIC;
-	text[0] = "Right stick sensitivity";
+	text[0] = "Stick sensitivity";
 	text[1] = "";
 	posx = 1000;
 	posy = MENU_START_Y + (MENU_SOUND_DY * 2);
@@ -140,7 +141,7 @@ instance MENUITEM_ZGAMEPAD_SENSITIVITY_SLIDER(C_MENU_ITEM_DEF)
 	dimy = MENU_SLIDER_DY;
 	onchgsetoption = "StickSensitivity";
 	onchgsetoptionsection = "ZGAMEPAD";
-	userfloat[0] = 30;
+	userfloat[0] = 25;
 	userstring[0] = MENU_SLIDER_POS_PIC;
 	flags = flags & ~IT_SELECTABLE;
 	flags = flags | IT_TXT_CENTER;
@@ -235,7 +236,7 @@ instance MENUITEM_ZGAMEPAD_HINTS_SCALE_SLIDER(C_MENU_ITEM_DEF)
 	dimy = MENU_SLIDER_DY;
 	onchgsetoption = "HintsIconScale";
 	onchgsetoptionsection = "ZGAMEPAD";
-	userfloat[0] = 10;
+	userfloat[0] = 25;
 	userstring[0] = MENU_SLIDER_POS_PIC;
 	flags = flags & ~IT_SELECTABLE;
 	flags = flags | IT_TXT_CENTER;
@@ -278,12 +279,35 @@ instance MENUITEM_ZGAMEPAD_HINTS_TRANSPARENCY_SLIDER(C_MENU_ITEM_DEF)
 
 
 
+instance MENUITEM_ZGAMEPAD_OPEN_LINK(C_MENU_ITEM_DEF)
+{
+	backpic = MENU_ITEM_BACK_PIC;
+	text[0] = "Open project page";
+	posx = 1000;
+	posy = MENU_START_Y + (MENU_SOUND_DY * 7);
+	dimx = 6192;
+	dimy = MENU_SOUND_DY;
+	onselaction[0] = SEL_ACTION_UNDEF;
+  oneventaction[1] = gamepad_open_project_link;
+	flags = flags | IT_TXT_CENTER;
+};
+
+func int gamepad_open_project_link()
+{
+	Open_Link("https://worldofplayers.ru/threads/42005/");
+	return 0;
+};
+
+
+
+
+
 instance MENUITEM_ZGAMEPAD_BACK(C_MENU_ITEM_DEF)
 {
 	backpic = MENU_ITEM_BACK_PIC;
 	text[0] = "BACK";
 	posx = 1000;
-	posy = MENU_BACK_Y;
+	posy = MENU_START_Y + (MENU_SOUND_DY * 9);
 	dimx = 6192;
 	dimy = MENU_SOUND_DY;
 	onselaction[0] = SEL_ACTION_BACK;

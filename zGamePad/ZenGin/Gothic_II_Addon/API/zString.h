@@ -58,7 +58,8 @@ namespace Gothic_II_Addon {
     zSTRING( char val )                            zInit( zSTRING_OnInit( val ) );
     zSTRING( long val )                            zInit( zSTRING_OnInit( val ) );
     zSTRING( zSTRING const* val )                  zInit( zSTRING_OnInit( val ) );
-    virtual ~zSTRING()                             zCall( 0x00401160 );  // scalar:0x00401140 vector:0x0041C760 destructor:0x00401160
+    void zSTRING_OnDestroy()                       zCall( 0x00401160 );
+    virtual ~zSTRING()                             zInit( zSTRING_OnDestroy() );  // scalar:0x00401140 vector:0x0041C760 destructor:0x00401160
     
     // Special Union CStringA constructor
     zSTRING( CStringA const& val ) { zSTRING_OnInit( (char const*)val ); }

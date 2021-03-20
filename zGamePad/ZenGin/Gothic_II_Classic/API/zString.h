@@ -57,7 +57,8 @@ namespace Gothic_II_Classic {
     zSTRING( char val )                   zInit( zSTRING_OnInit( val ) );
     zSTRING( long val )                   zInit( zSTRING_OnInit( val ) );
     zSTRING( zSTRING const* val )         zInit( zSTRING_OnInit( val ) );
-    virtual ~zSTRING()                    zCall( 0x00401160 );
+    void zSTRING_OnDestroy()              zCall( 0x00401160 );
+    virtual ~zSTRING()                    zInit( zSTRING_OnDestroy() );
     
     // Special Union CStringA constructor
     zSTRING( CStringA const& val ) { zSTRING_OnInit( (char const*)val ); }
