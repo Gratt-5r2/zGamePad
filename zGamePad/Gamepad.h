@@ -246,6 +246,9 @@ namespace GOTHIC_ENGINE {
     return (float)ydim / 1080.0f;
   }
 
+  void SetKeyStateAndInsert( DXKEY keyID, bool_t state );
+  DXKEY GetBinded( uint16 bind );
+  void Input_GetMousePosReal( float& x, float& y, float& z );
 
 
 

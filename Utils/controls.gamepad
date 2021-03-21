@@ -2,90 +2,210 @@
 String interact
     Rus "Взаимодействовать"
     Eng "Interact"
-    
+    Pol "Interakcja"
+    Deu "Interagieren"
+
+String remove_weapon
+    Rus "Убрать оружие"
+    Eng "Remove weapon"
+    Pol "Schowaj Broń"
+    Deu "Waffe entfernen"
+
 String draw_weapon
     Rus "Достать оружие"
     Eng "Draw weapon"
-    
+    Pol "Wyciągnij Broń"
+    Deu "Waffe ziehen"
+
 String draw_weapon_melee
     Rus "Ближний бой"
     Eng "Fight melee"
-    
+    Pol "Walka Wręcz"
+
 String draw_weapon_ranged
     Rus "Дальний бой"
     Eng "Fight range"
-    
+    Pol "Walka na Dystans"
+
+String draw_weapon_ranged_melee
+    Rus "Лук/меч"
+    Eng "Bow/sword"
+    Pol "Łuk/Miecz"
+    Deu "Bogen/Schwert"
+
 String end_transform
     Rus "Вернуть облик"
     Eng "Reset form"
-    
+    Pol "Przywróć Formę"
+    Deu "Formular leeren"
+
 String target_lock
     Rus "Захват цели"
     Eng "Target lock"
-    
+    Pol "Blokada Celu"
+    Deu "Zielsperre"
+  
 String aim
     Rus "Целиться"
     Eng "Aim"
-    
+    Pol "Cel"
+    Deu "Zielen"
+
 String shoot
     Rus "Стрелять"
     Eng "Shoot"
-    
+    Pol "Strzał"
+    Deu "Schießen"
+
 String cast
     Rus "Кастовать"
     Eng "Cast"
-    
+    Pol "Czarować"
+    Deu "Zauber wirken"
+
 String attack
     Rus "Атака"
     Eng "Attack"
-    
+    Pol "Atak"
+    Deu "Attacke"
+
 String parry
     Rus "Парирование"
     Eng "Parry"
-    
+    Pol "Parować"
+    Deu "Parieren"
+
 String next_enemy
     Rus "Следующая цель"
     Eng "Next enemy"
-    
+    Pol "Następny Przeciwnik"
+    Deu "Nächster Feind"
+
 String shift
     Rus "Shift"
     Eng "Shift"
-    
+    Pol "Shift"
+    Deu "Shift"
+
 String category_prev
     Rus "Пред. категория"
-    Eng "Prev. categiry"
+    Eng "Prev. category"
+    Pol "Wstępna Kategoria"
+    Deu "Zurück Kategorie"
     
 String category_next
     Rus "След. категория"
-    Eng "Next categiry"
-    
+    Eng "Next category"
+    Pol "Następna Kategoria"
+    Deu "Nächste Kategorie"
+
 String confim_trade
     Rus "Совершить обмен"
     Eng "Confirm trade"
+    Pol "Potwierdź Handel"
+    Deu "Bestätigen Sie den Handel"
     
 String drop_item
     Rus "Выбросить"
     Eng "Drop"
+    Pol "Wyrzuć"
+    Deu "Fallen"
     
-String screen_status
-    Rus "Статус"
-    Eng "Status"
+String trans_item
+    Rus "Переместить один"
+    Eng "Transfer one"
+    Pol "Przekaż Jeden"
+    Deu "Übertragen Sie eine"
     
-String screen_log
-    Rus "Дневник"
-    Eng "Log"
+String trans_few_items
+    Rus "Переместить несколько"
+    Eng "Transfer a few"
+    Pol "Przekaż Kilka"
+    Deu "Übertragen Sie ein paar"
+    
+String screen_status_log
+    Rus "Статус/Дневник"
+    Eng "Status/Log"
+    Pol "Status/Dziennik"
+    Deu "Status/Tagebuch"
     
 String quick_menu
     Rus "Быстрое меню"
     Eng "Quick menu"
+    Pol "Szybkie Menu"
+    Deu "Schnellmenü"
     
 String turn
     Rus "Поворачивать"
     Eng "Turn"
-    
+    Pol "Obróć"
+    Deu "Wende"
+
 String swim
     Rus "Плыть"
     Eng "Swim"
+    Pol "Pływać"
+    Deu "Schwimmen"
+
+String place_item
+    Rus "Поместить предмет"
+    Eng "Place item"
+    Pol "Umieść Przedmiot"
+    Deu "Gegenstand platzieren"
+
+String select_item
+    Rus "Выбрать предмет"
+    Eng "Select item"
+    Pol "Wybierz Przedmiot"
+    Deu "Gegenstand wählen"
+
+String remove_item
+    Rus "Убрать предмет"
+    Eng "Remove item"
+    Pol "Usuń Przedmiot"
+    Deu "Gegenstand entfernen"
+
+String focus_item
+    Rus "Фокус"
+    Eng "Focus"
+    Pol "Skupienie"
+    Deu "Fokus"
+    
+String menu_back
+    Rus "Назад"
+    Eng "Back"
+    Pol "Wróć"
+    Deu "Zurück"
+
+String menu_cancel
+    Rus "Отмена"
+    Eng "Cancel"
+    Pol "Przerwij"
+    Deu "Stornieren"
+    
+String on_quick_bar
+    Rus "В быстрый доступ"
+    Eng "On quick bar"
+    Pol "Na Pasku Szybkiego Dostępu"
+    Deu "Auf Schnellbar"
+    
+String picklock
+    Rus "Использовать отмычку"
+    Eng "Use picklock"
+    Pol "Użyj Wytrychu"
+    Deu "Verwenden Sie Picklock"
+    
+String look_around
+    Rus "Смотреть назад"
+    Eng "Look around"
+    Pol "Rozglądaj się"
+    Deu "Umschauen"
+    
+String settings
+    Rus "Настройки"
+    Eng "Settings"
+    Pol "Ustawienia"
+    Deu "Einstellungen"
 #endregion
 
 #region ArrowPad Default
@@ -93,31 +213,34 @@ String swim
 KeyRecord
   Combination JOY_LEFT
   Emulation   GAME_SCREEN_STATUS
-  Condition   !Cond_FightMode, !Cond_InterfaceIsOpen, !Cond_InventoryIsOpen, !GAME_WEAPON
-  Help        screen_status
+  Condition   !Cond_FightMode, !Cond_InterfaceIsOpen, !Cond_InventoryIsOpen, !GAME_WEAPON, !JOY_LEFT
   
 // Open log
 KeyRecord
   Combination JOY_RIGHT
   Emulation   GAME_SCREEN_LOG
-  Condition   !Cond_FightMode, !Cond_InterfaceIsOpen, !Cond_InventoryIsOpen, !GAME_WEAPON
-  Help        screen_log
+  Condition   !Cond_FightMode, !Cond_InterfaceIsOpen, !Cond_InventoryIsOpen, !GAME_WEAPON, !JOY_RIGHT
   
-// Show circle TODO
 KeyRecord
+  Combination JOY_LEFTRIGHT
+  Condition   !Cond_FightMode, !Cond_InterfaceIsOpen, !Cond_InventoryIsOpen, !GAME_WEAPON
+  Help        screen_status_log
+  
+// Show ring
+KeyRecord Toggled
   Combination JOY_UP
   Emulation   KEY_3
   Condition   !Cond_InterfaceIsOpen, !Cond_InventoryIsOpen, !GAME_WEAPON
   
-// Show circle
-KeyRecord
+// Show ring In bottom
+KeyRecord Toggled
   Combination JOY_DOWN
-  Emulation   KEY_LSHIFT, KEY_3
+  Emulation   KEY_3, MOUSE_UP
   Condition   !Cond_InterfaceIsOpen, !Cond_InventoryIsOpen, !GAME_WEAPON
   
 // Show information
 KeyRecord
-  Combination JOY_UP, JOY_DOWN
+  Combination JOY_UPDOWN
   Condition   !Cond_InterfaceIsOpen, !Cond_InventoryIsOpen, !GAME_WEAPON
   Help        quick_menu
 #endregion 
@@ -189,7 +312,13 @@ KeyRecord Toggled
 KeyRecord
   Combination JOY_B
   Emulation   KEY_ESCAPE
-  Condition   Cond_InterfaceIsOpen, !JOY_B
+  Condition   Cond_InterfaceIsOpen, !Cond_UsesPicklock, !JOY_B
+
+// Close menu
+KeyRecord
+  Combination JOY_B
+  Emulation   KEY_DOWN
+  Condition   Cond_InterfaceIsOpen, Cond_UsesPicklock, !JOY_B
   
 // Action
 KeyRecord Toggled
@@ -214,6 +343,12 @@ KeyRecord Toggled
   Combination JOY_LT
   Emulation   KEY_DELETE
   Condition   Cond_InventoryIsOpen, Cond_IsOverlayTop
+  
+// Hint
+KeyRecord
+  Combination JOY_LEFTRIGHT
+  Condition   Cond_UsesPicklock
+  Help        picklock
 #endregion 
 
 #region Inventory
@@ -265,28 +400,66 @@ KeyRecord
 KeyRecord Toggled
   Combination JOY_A
   Emulation   GAME_ACTION
-  Condition   Cond_InventoryIsOpen, !JOY_A
+  Condition   Cond_InventoryIsOpen, !Cond_InterfaceIsOpen, !JOY_A
   
 // Special action
 KeyRecord
   Combination JOY_LT
   Emulation   KEY_LSHIFT
   Condition   Cond_InventoryIsOpen, !Cond_IsOverlayTop
-  Help        shift
+//  Help        shift
   
 // Accept
 KeyRecord
   Combination JOY_Y
   Emulation   KEY_RETURN
-  Condition   Cond_InventoryIsOpen, !JOY_Y, Cond_G1
+  Condition   Cond_InventoryIsOpen, !JOY_Y, Cond_G1, Cond_IsOnTrade, !Cond_IsOverlayTop
   Help        confim_trade
   
 // Drop item
 KeyRecord
   Combination JOY_X
   Emulation   GAME_SMOVE
-  Condition   Cond_InventoryIsOpen
+  Condition   Cond_InventoryIsOpen, !Cond_IsOverlayTop
+  
+KeyRecord
+  Combination JOY_RT
+  Condition   Cond_InventoryIsOpen, Cond_IsOverlayTop
+  Help        place_item
+  
+KeyRecord
+  Combination JOY_LT
+  Condition   Cond_InventoryIsOpen, Cond_IsOverlayTop
+  Help        remove_item
+  
+KeyRecord
+  Combination JOY_RSTICK_FULL
+  Condition   Cond_InventoryIsOpen, Cond_IsOverlayTop
+  Help        focus_item
+  
+KeyRecord
+  Combination JOY_B
+  Condition   Cond_InventoryIsOpen, Cond_IsOverlayTop
+  
+KeyRecord
+  Combination JOY_X
+  Condition   Cond_InventoryIsOpen, Cond_HasLeftContainer
+  Help        trans_few_items
+  
+KeyRecord
+  Combination JOY_X
+  Condition   Cond_InventoryIsOpen, !Cond_IsOverlayTop, !Cond_HasLeftContainer
   Help        drop_item
+  
+KeyRecord
+  Combination JOY_A
+  Condition   Cond_InventoryIsOpen, Cond_HasLeftContainer
+  Help        trans_item
+  
+KeyRecord
+  Combination JOY_A
+  Condition   Cond_InventoryIsOpen, !Cond_IsOverlayTop, !Cond_HasLeftContainer
+  Help        select_item
 #endregion
 
 #region ArrowPad in fight
@@ -304,8 +477,8 @@ KeyRecord
 
 // Hint
 KeyRecord
-  Combination JOY_LEFT, JOY_RIGHT
-  Condition   Cond_FightMode, Cond_HasFocusVob
+  Combination JOY_LEFTRIGHT
+  Condition   Cond_FightMode, Cond_HasFocusVob, !Cond_IsOverlayTop
   Help        next_enemy
 #endregion
 
@@ -348,7 +521,13 @@ KeyRecord
 KeyRecord
   Combination JOY_Y
   Emulation   GAME_WEAPON
-  Condition   !Cond_InventoryIsOpen, !JOY_Y
+  Condition   !Cond_InventoryIsOpen, !JOY_Y, !Cond_IsOverlayTop
+
+// Hint
+KeyRecord
+  Combination JOY_Y
+  Condition   !Cond_InventoryIsOpen, !Cond_InterfaceIsOpen, !Cond_InTransformation, Cond_FightMode, !Cond_IsOverlayTop
+  Help        remove_weapon
 
 // Hint
 KeyRecord
@@ -374,14 +553,20 @@ KeyRecord
   Combination JOY_LT
   Emulation   KEY_2
   Condition   !Cond_FightMode, !Cond_InterfaceIsOpen, !Cond_InventoryIsOpen, !Cond_Diving
-  Help        draw_weapon_ranged
+//  Help        draw_weapon_ranged
   
 // Draw melee weapon
 KeyRecord
   Combination JOY_RT
   Emulation   KEY_1
   Condition   !Cond_FightMode, !Cond_InterfaceIsOpen, !Cond_InventoryIsOpen, !Cond_Diving
-  Help        draw_weapon_melee
+//  Help        draw_weapon_melee
+  
+// Hint
+KeyRecord
+  Combination JOY_LT, JOY_RT
+  Condition   !Cond_FightMode, !Cond_InterfaceIsOpen, !Cond_InventoryIsOpen, !Cond_Diving
+  Help        draw_weapon_ranged_melee
   
 // First person
 KeyRecord
@@ -398,8 +583,15 @@ KeyRecord
 KeyRecord
   Combination JOY_RSTICK
   Emulation   KEY_F13
-  Condition   Cond_CanLockTarget, !Cond_InventoryIsOpen
+  Condition   Cond_CanLockTarget, !Cond_InventoryIsOpen, !Cond_IsOverlayTop
   Help        target_lock
+
+// Look around
+KeyRecord
+  Combination JOY_RB
+  Emulation   GAME_LOOK
+  Condition   !Cond_InterfaceIsOpen, !Cond_InventoryIsOpen, !Cond_IsOverlayTop, GAME_UP
+  Help        look_around
 #endregion
 
 #region Left stick
@@ -431,17 +623,17 @@ KeyRecord
 
 #region Melee
 // Parade
-KeyRecord
+KeyRecord Toggled
   Combination JOY_LT
   Emulation   GAME_DOWN, GAME_ACTION
-  Condition   Cond_FightModeMelee, !Cond_InterfaceIsOpen
+  Condition   Cond_FightModeMelee, !Cond_InterfaceIsOpen, !GAME_UP, !GAME_ACTION
+  Help        parry
   
 // Punch
 KeyRecord
   Combination JOY_RT
   Emulation   GAME_UP, GAME_ACTION
   Condition   Cond_FightModeMelee, !Cond_InterfaceIsOpen
-  Help        parry
   
 // Walk + punch
 KeyRecord
@@ -459,13 +651,13 @@ KeyRecord
 KeyRecord
   Combination JOY_LB
   Emulation   GAME_LEFT, GAME_ACTION
-  Condition   Cond_FightModeMelee, !Cond_InterfaceIsOpen
+  Condition   Cond_FightModeMelee, !Cond_InterfaceIsOpen, !GAME_UP
   
 // Right punch
 KeyRecord
   Combination JOY_RB
   Emulation   GAME_RIGHT, GAME_ACTION
-  Condition   Cond_FightModeMelee, !Cond_InterfaceIsOpen
+  Condition   Cond_FightModeMelee, !Cond_InterfaceIsOpen, !GAME_UP
   
 // Hint
 KeyRecord
@@ -526,14 +718,31 @@ KeyRecord Toggled
     Condition   Cond_IsOverlayTop, !JOY_UP
 
 KeyRecord Toggled
-    Combination JOY_DOWN
-    Emulation   MOUSE_WHEELDOWN
-    Condition   Cond_IsOverlayTop, !JOY_DOWN
+  Combination JOY_DOWN
+  Emulation   MOUSE_WHEELDOWN
+  Condition   Cond_IsOverlayTop, !JOY_DOWN
 
 KeyRecord Toggled
-    Combination JOY_RSTICK
-    Emulation   KEY_COMMA
-    Condition   Cond_InventoryIsOpen, !JOY_RSTICK
+  Combination JOY_RSTICK
+  Emulation   KEY_3
+  Condition   Cond_InventoryIsOpen, !Cond_IsOverlayTop, !Cond_HasLeftContainer
+  Help        on_quick_bar
+  
+KeyRecord
+  Combination JOY_RSTICK_FULL
+  Condition   !Cond_InventoryIsOpen, Cond_IsOverlayTop
+  Help        focus_item
+  
+KeyRecord
+  Combination JOY_RT
+  Condition   !Cond_InventoryIsOpen, Cond_IsOverlayTop
+  Help        select_item
+  
+KeyRecord
+  Combination JOY_Y
+  Emulation   KEY_F1
+  Condition   !Cond_InventoryIsOpen, Cond_IsOverlayTop
+  Help        settings
 #endregion
 
 #region Diving
@@ -547,12 +756,3 @@ KeyRecord Toggled
     Condition   Cond_Diving
     Help        swim
 #endregion
-
-
-
-
-
-
-
-
-

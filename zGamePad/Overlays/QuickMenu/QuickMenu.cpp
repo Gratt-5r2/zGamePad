@@ -58,6 +58,13 @@ namespace GOTHIC_ENGINE {
 
 	void zCGamepadQuickMenu::Blit() {
     zCView::Blit();
+
+#if ENGINE < Engine_G2
+		float x, y, z;
+		Input_GetMousePosReal( x, y, z );
+		if( z != 0 )
+      SetKeyStateAndInsert( z > 0 ? MOUSE_WHEELUP : MOUSE_WHEELDOWN, True );
+#endif
 	}
 
 
@@ -240,6 +247,25 @@ namespace GOTHIC_ENGINE {
 
 
 	int zCGamepadQuickMenu::HandleEvent( int key ) {
+		sizeof( zCMenu );
+		if( key == KEY_F1 ) {
+			static zCMenu* menu = Null;
+			if( menu == Null ) {
+				menu = zCMenu::Create( Z "ZGAMEPAD_MENU_OPT" );
+				if( menu ) {
+					ogame->Pause();
+					menu->Run();
+					menu->Release();
+					ogame->Unpause();
+					gameMan->ApplySomeSettings();
+					SetHandleEventTop();
+					menu = Null;
+				}
+			}
+
+			return True;
+		}
+
 		if( key == KEY_ESCAPE || key == MOUSE_BUTTONRIGHT ) {
 			Close();
 			return True;

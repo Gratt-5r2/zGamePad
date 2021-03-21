@@ -5,7 +5,7 @@
 
 namespace Gothic_II_Addon {
 
-#define zRELEASE( obj ) { (obj)->Release(); obj = Null; }
+#define zRELEASE( obj ) { if(obj) (obj)->Release(); obj = Null; }
 #define zADDREF( obj )  (obj)->AddRef()
 #define zNEW( obj ) new obj
 #define zDELETE( obj ) delete obj

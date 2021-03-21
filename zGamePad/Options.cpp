@@ -6,7 +6,7 @@ namespace GOTHIC_ENGINE {
     int gamepadEnabled           = zoptions->ReadBool(   "ZGAMEPAD", "Enabled",              True );
     int controllerID             = zoptions->ReadInt(    "ZGAMEPAD", "ControllerID",         0 );
     zSTRING controlsFile         = zoptions->ReadString( "ZGAMEPAD", "ControlsFile",         "Controls.Gamepad" );
-    float stickSensitivity       = zoptions->ReadReal(   "ZGAMEPAD", "StickSensitivity",     ENGINE >= Engine_G2 ? 0.5f : 0.2f );
+    float stickSensitivity       = zoptions->ReadReal(   "ZGAMEPAD", "StickSensitivity",     0.5f );
     int hintsEnabled             = zoptions->ReadBool(   "ZGAMEPAD", "HintsEnabled",         True );
     int controllerScheme         = zoptions->ReadInt(    "ZGAMEPAD", "ControllerScheme",     0 );
     float hintsIconScale         = zoptions->ReadReal(   "ZGAMEPAD", "HintsIconScale",       0.5f );
@@ -18,7 +18,7 @@ namespace GOTHIC_ENGINE {
     Opt_GamepadEnabled       = gamepadEnabled != false;
     Opt_ControllerID         = controllerID;
     Opt_ControlsFile         = controlsFile;
-    Opt_StickSensitivity     = stickSensitivity * 5.0f;
+    Opt_StickSensitivity     = stickSensitivity * 2.0f;
     Opt_HintsEnabled         = hintsEnabled != false;
     Opt_ControllerScheme     = controllerScheme;
     Opt_HintsIconScale       = hintsIconScale * 5.0f;

@@ -161,8 +161,6 @@ namespace GOTHIC_ENGINE {
 
 
 
-  extern void Input_GetMousePosReal( float& x, float& y, float& z );
-
   float SmoothIncrease( const float& value, const float& max, const uint& strength = 1 ) {
     static float limit = PI / 2.0f;
     float multiplier = limit / max;
@@ -200,6 +198,10 @@ namespace GOTHIC_ENGINE {
       // with using the mouse device
       float x, y, z;
       Input_GetMousePosReal( x, y, z );
+#if ENGINE < Engine_G2
+      x /= 10;
+      y /= 10;
+#endif
       if( abs( x + y ) > MOUSE_EPS ) {
         MouseState += zVEC2( x, -y ) * 500.0f;
         if( MouseState.Length() > stickCircleMax )

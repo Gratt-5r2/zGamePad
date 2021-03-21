@@ -3,3 +3,4 @@
 // User API for zCMenu
 // Add your methods here
 
+void Leave_Union();
