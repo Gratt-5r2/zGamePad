@@ -74,7 +74,7 @@ namespace GOTHIC_ENGINE {
 
     int startPosX = 8192;
 #if ENGINE < Engine_G2
-    if( player->inventory2.IsOpen() ) {
+    if( player && player->inventory2.IsOpen() ) {
       int sx, sy;
       player->inventory2.GetSize( sx, sy );
       startPosX = 8192 - (int)((float)sx * CalculateInterfaceScale()) - 100;
