@@ -32,7 +32,7 @@ namespace GOTHIC_ENGINE {
         Opt_UseItemError = "Необходимо быть на земле.";
         break;
       case Lang_Ger:
-        Opt_UseItemError = "Du solltest am Boden sein.";
+        Opt_UseItemError = "Du solltest dich am Boden befinden.";
         break;
       case Lang_Pol:
         Opt_UseItemError = "Użycie przedmiotów możliwe tylko na gruncie.";

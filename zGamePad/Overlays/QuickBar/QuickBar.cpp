@@ -517,7 +517,7 @@ namespace GOTHIC_ENGINE {
 
   string zCGamepadQuickBar_Weapons::GetDescription() {
     switch( Union.GetSystemLanguage() ) {
-      case Lang_Rus: return (W L"Магия и оружия").     WToA( ANSI_CODEPAGE_CYRILLIC );
+      case Lang_Rus: return (W L"Магия и оружие").     WToA( ANSI_CODEPAGE_CYRILLIC );
       case Lang_Ger: return (W L"Magie und Waffen").   WToA( ANSI_COPEDAGE_NORTHORWESTERN_EUROPEAN );
       case Lang_Pol: return (W L"Magia i bronie").     WToA( ANSI_COPEDAGE_CENTRALOREASTERN_EUROPEAN );
       default:       return (W L"Magic and weapons" ). WToA( ANSI_COPEDAGE_NORTHORWESTERN_EUROPEAN );
@@ -669,10 +669,10 @@ namespace GOTHIC_ENGINE {
 
   string zCGamepadQuickBar_Items::GetDescription() {
     switch( Union.GetSystemLanguage() ) {
-      case Lang_Rus: return (W L"Предметы").   WToA( ANSI_CODEPAGE_CYRILLIC );
-      case Lang_Ger: return (W L"Artikel").    WToA( ANSI_COPEDAGE_NORTHORWESTERN_EUROPEAN );
-      case Lang_Pol: return (W L"Przedmioty"). WToA( ANSI_COPEDAGE_CENTRALOREASTERN_EUROPEAN );
-      default:       return (W L"Items" ).     WToA( ANSI_COPEDAGE_NORTHORWESTERN_EUROPEAN );
+      case Lang_Rus: return (W L"Предметы").    WToA( ANSI_CODEPAGE_CYRILLIC );
+      case Lang_Ger: return (W L"Gegenstände"). WToA( ANSI_COPEDAGE_NORTHORWESTERN_EUROPEAN );
+      case Lang_Pol: return (W L"Przedmioty").  WToA( ANSI_COPEDAGE_CENTRALOREASTERN_EUROPEAN );
+      default:       return (W L"Items" ).      WToA( ANSI_COPEDAGE_NORTHORWESTERN_EUROPEAN );
     }
   }
 
