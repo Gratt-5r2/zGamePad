@@ -199,7 +199,7 @@ namespace GOTHIC_ENGINE {
     static bool waitingSlotID = false;
 
     if( key == KEY_3 ) {
-      if( owner == player && !Gamepad_GetStaticCondition( Cond_HasLeftContainer ) ) {
+      if( owner == player && !Cond_HasLeftContainer() ) {
         itemsRing->ShowAt( screen, zEGamepadQuickBarAlignment_Center );
         waitingSlotID = true;
       }
