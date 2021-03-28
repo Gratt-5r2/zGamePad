@@ -11,6 +11,7 @@
 #include "Overlays/ControlsHelp/ControlsHelp_Sprites.cpp"
 #include "Overlays/ControlsHelp/ControlsHelp.cpp"
 #include "Gamepad.cpp"
+#include "DSGamepad.cpp"
 #include "ControlParser.cpp"
 #include "ControlOverrides.cpp"
 #include "FocusNpc.cpp"

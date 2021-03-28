@@ -5,6 +5,7 @@
 #pragma region Includes
 #include "Options.h"
 #include "Gamepad.h"
+#include "DSGamepad.h"
 #include "ControlParser.h"
 #include "Overlays/GamepadOverlay.h"
 #include "Overlays/QuickBar/QuickBar.h"

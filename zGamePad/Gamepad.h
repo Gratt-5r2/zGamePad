@@ -107,6 +107,8 @@ namespace GOTHIC_ENGINE {
     ArrowPad_LeftRight = 1 << 27,
     LeftStick          = 1 << 28,
     RightStick         = 1 << 29,
+
+
   };
 
   struct zTStickState {
