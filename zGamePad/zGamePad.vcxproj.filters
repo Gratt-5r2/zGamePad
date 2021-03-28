@@ -241,6 +241,9 @@
     <Filter Include="Plugin\Workspace\Gamepad\Options">
       <UniqueIdentifier>{bf72e7bf-573c-452c-bd55-8bd7c873cc53}</UniqueIdentifier>
     </Filter>
+    <Filter Include="Plugin\Workspace\Gamepad\Osmith">
+      <UniqueIdentifier>{3de86f09-53c9-427f-b05b-d813ed830c05}</UniqueIdentifier>
+    </Filter>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="Interface.cpp">
@@ -2863,6 +2866,12 @@
     </ClInclude>
     <ClInclude Include="Options.cpp">
       <Filter>Plugin\Workspace\Gamepad\Options</Filter>
+    </ClInclude>
+    <ClInclude Include="DSGamepad.h">
+      <Filter>Plugin\Workspace\Gamepad\Osmith</Filter>
+    </ClInclude>
+    <ClInclude Include="DSGamepad.cpp">
+      <Filter>Plugin\Workspace\Gamepad\Osmith</Filter>
     </ClInclude>
   </ItemGroup>
   <ItemGroup>
