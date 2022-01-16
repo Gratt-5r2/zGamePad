@@ -122,6 +122,7 @@ namespace GOTHIC_ENGINE {
   void CGameManager::Init_Union( HWND& hWnd ) {
     THISCALL( Hook_CGameManager_Init )(hWnd);
     XInputDevice.InitDevice();
+    DS4Device.InitDevice();
   }
 
 

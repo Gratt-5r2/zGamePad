@@ -244,6 +244,9 @@
     <Filter Include="Plugin\Workspace\Gamepad\Overlays\QuickKeys">
       <UniqueIdentifier>{578842b8-2f27-4845-ad88-9b569db7a002}</UniqueIdentifier>
     </Filter>
+    <Filter Include="Plugin\Workspace\Gamepad\Osmith">
+      <UniqueIdentifier>{b919ea27-b632-4b27-911f-d6f29418aaf2}</UniqueIdentifier>
+    </Filter>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="Interface.cpp">
@@ -2879,6 +2882,13 @@
     <ClInclude Include="resource.h">
       <Filter>Plugin\Workspace\Plugin</Filter>
     </ClInclude>
+    <ClInclude Include="DSGamepad.h">
+      <Filter>Plugin\Workspace\Gamepad\Osmith</Filter>
+    </ClInclude>
+    <ClInclude Include="DSGamepad.cpp">
+      <Filter>Plugin\Workspace\Gamepad\Osmith</Filter>
+    </ClInclude>
+    <ClInclude Include="JoyShockLibrary.h" />
   </ItemGroup>
   <ItemGroup>
     <None Include=".build_settings.inl">
