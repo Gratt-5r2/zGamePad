@@ -8,6 +8,7 @@
 #include "Overlays/GamepadOverlay.cpp"
 #include "Overlays/QuickBar/QuickBar.cpp"
 #include "Overlays/QuickMenu/QuickMenu.cpp"
+#include "Overlays/QuickKeys/QuickKeys.cpp"
 #include "Overlays/ControlsHelp/ControlsHelp_Sprites.cpp"
 #include "Overlays/ControlsHelp/ControlsHelp.cpp"
 #include "Gamepad.cpp"
@@ -16,6 +17,7 @@
 #include "FocusNpc.cpp"
 #include "Hooks.cpp"
 #include "SaveMenu.cpp"
+#include "VectorMoving.cpp"
 #include "Plugin.cpp"
 #pragma endregion
 

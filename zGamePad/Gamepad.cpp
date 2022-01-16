@@ -391,33 +391,40 @@ namespace GOTHIC_ENGINE {
     timer.ClearUnused();
 
     // Maximum of Triggers or Sticks - 65536
-    LeftStick.X = Gamepad.Gamepad.sThumbLX;
-    LeftStick.Y = Gamepad.Gamepad.sThumbLY;
-    int length  = sqrti( LeftStick.X * LeftStick.X + LeftStick.Y * LeftStick.Y );
+    LeftStick.X   = Gamepad.Gamepad.sThumbLX;
+    LeftStick.Y   = Gamepad.Gamepad.sThumbLY;
+    int length    = sqrti( LeftStick.X * LeftStick.X + LeftStick.Y * LeftStick.Y );
+    StrafePressed = false;
 
-    if( length > 15000 ) {
+    if( length > DEADZONE_L ) {
+      StrafePressed = abs( LeftStick.X * 5 ) > abs( LeftStick.Y * 7 );
+
       // Check strafe
-      if( abs( LeftStick.X ) > abs( LeftStick.Y ) ) {
+      if( Opt_MotionType == 0 && StrafePressed ) {
         KeyStates |= LeftStick.X > 0 ?
           GameRightStrafe :
           GameLeftStrafe;
       }
-      else {
+      else
+      {
         // Check run
-        if( LeftStick.Y > 0 ) {
+        if( LeftStick.Y > 0 || StrafePressed ) {
+          WalkBack = false;
           if( runActive || timer[0u].Await( 20 ) ) {
             runActive = true;
 
             // Walk situations
-            bool canWalk = length <= 20000 && !(player && player->fmode) && !Cond_CanSneaking();
+            bool canWalk = length <= 25000 && !(player && player->fmode) && !Cond_CanSneaking();
 
             KeyStates |= canWalk ?
               GameWalk :
               GameForward;
           }
         }
-        else
+        else {
           KeyStates |= GameBackward;
+          WalkBack = true;
+        }
       }
     }
     else if( runActive ) {
@@ -438,6 +445,16 @@ namespace GOTHIC_ENGINE {
     if( RightTrigger > 50 )
       KeyStates |= GamePunch;
   }
+
+
+
+
+
+
+
+  
+
+
 
 
 
@@ -516,6 +533,7 @@ namespace GOTHIC_ENGINE {
 
     KeyStates = Gamepad.Gamepad.wButtons;
     UpdateSticksState();
+    KeyStatesReal = KeyStates;
 
     if( ForceVideoSkipping() || !ogame )
      return;
@@ -632,6 +650,24 @@ namespace GOTHIC_ENGINE {
     }
 
     return false;
+  }
+
+
+
+  bool zCXInputDevice::JoyPressed( const JOYKEY& keys ) {
+    return KeyStatesReal & keys;
+  }
+
+
+
+  bool zCXInputDevice::StrafeButtonIsPressed() {
+    return StrafePressed;
+  }
+
+
+
+  bool zCXInputDevice::IsBacKWalk() {
+    return WalkBack;
   }
 
 

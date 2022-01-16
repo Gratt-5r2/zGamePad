@@ -9,6 +9,7 @@
 #include "Overlays/GamepadOverlay.h"
 #include "Overlays/QuickBar/QuickBar.h"
 #include "Overlays/QuickMenu/QuickMenu.h"
+#include "Overlays/QuickKeys/QuickKeys.h"
 #include "Overlays/ControlsHelp/ControlsHelp.h"
 #include "Plugin.h"
 #pragma endregion

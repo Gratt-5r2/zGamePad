@@ -36,14 +36,20 @@ namespace GOTHIC_ENGINE {
   }
 
 
+  inline void Npc_SetEnemy( oCNpc* attacker, oCNpc* victim ) {
+    attacker->SetFocusVob( victim );
+    attacker->SetEnemy( victim );
+    attacker->anictrl->hitTarget = victim;
+    SetHeadingToEnemy( attacker, victim );
+  }
+
+
 
   // Find next LEFT nearest enemy
   bool GetNextLeftEnemy() {
     oCNpc* npc = player->GetNearestFightNpcLeft_Union();
     if( npc && !npc->IsDead() ) {
-      player->SetFocusVob( npc );
-      player->SetEnemy( npc );
-      SetHeadingToEnemy( player, npc );
+      Npc_SetEnemy( player, npc );
       return true;
     }
 
@@ -56,9 +62,7 @@ namespace GOTHIC_ENGINE {
   bool GetNextRightEnemy() {
     oCNpc* npc = player->GetNearestFightNpcRight_Union();
     if( npc && !npc->IsDead() ) {
-      player->SetFocusVob( npc );
-      player->SetEnemy( npc );
-      SetHeadingToEnemy( player, npc );
+      Npc_SetEnemy( player, npc );
       return true;
     }
 
@@ -71,9 +75,7 @@ namespace GOTHIC_ENGINE {
   bool GetNextEnemy() {
     oCNpc* npc = player->GetNearestFightNpc_Union();
     if( npc && !npc->IsDead() ) {
-      player->SetFocusVob( npc );
-      player->SetEnemy( npc );
-      SetHeadingToEnemy( player, npc );
+      Npc_SetEnemy( player, npc );
       return true;
     }
 

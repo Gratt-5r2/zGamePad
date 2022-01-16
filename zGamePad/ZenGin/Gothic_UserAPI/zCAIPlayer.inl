@@ -3,3 +3,5 @@
 // User API for zCAIPlayer
 // Add your methods here
 
+void DoAutoRoll_Union();
+int CheckEnoughSpaceMoveForward_Union( int );

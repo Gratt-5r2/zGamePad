@@ -165,11 +165,12 @@ namespace GOTHIC_ENGINE {
     static float limit = PI / 2.0f;
     float multiplier = limit / max;
     float result = value;
+    float invert = value < 0.0f ? -1.0f : 1.0f;
 
     for( uint i = 0; i < strength; i++ )
       result = (cos( result * multiplier + PI ) + 1.0f) * max;
 
-    return result;
+    return result * invert;
   }
 
   void zCGamepadQuickBar::GetSelectedCellID( uint& ringID, uint& cellID ) {
@@ -190,7 +191,11 @@ namespace GOTHIC_ENGINE {
     static const float MOUSE_EPS = 0.0005f;
 
     // Define a stick offset in ring coordinates
-    XInputDevice.GetStickStatesCircle( StickStateLeft, StickStateRight );
+    if( Opt_ControllerScheme == 0 )
+      XInputDevice.GetStickStatesCircle( StickStateLeft, StickStateRight );
+    else
+      XInputDevice.GetStickStatesSquare( StickStateLeft, StickStateRight );
+
     zVEC2 stickVector = zVEC2( (float)StickStateRight.X, (float)StickStateRight.Y );
     if( stickVector.Length() < JOY_EPS ) {
 

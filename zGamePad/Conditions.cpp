@@ -48,6 +48,7 @@ namespace GOTHIC_ENGINE {
     Gamepad_SetStaticCondition( Cond_HasLeftContainer );
     Gamepad_SetStaticCondition( Cond_UsesPicklock );
     Gamepad_SetStaticCondition( Cond_IsOnTrade );
+    Gamepad_SetStaticCondition( Cond_ConsoleIsOpen );
   }
 
 
@@ -310,5 +311,19 @@ namespace GOTHIC_ENGINE {
 
   bool Cond_IsOnTrade() {
     return player && oCInformationManager::GetInformationManager().Mode == oCInformationManager::INFO_MGR_MODE_TRADE;
+  }
+
+
+
+  bool Cond_ConsoleIsOpen() {
+    zCInputCallback* topCallback = zCInputCallback::inputList.GetNextInList()->GetData();
+    zCConsole* con = dynamic_cast<zCConsole*>(topCallback);
+    return con && con->IsVisible();
+      // (zcon             && zcon->IsVisible()) ||
+      // (game_species_con && game_species_con->IsVisible()) ||
+      // (game_fight_con   && game_fight_con->IsVisible()) ||
+      // (edit_con         && edit_con->IsVisible()) ||
+      // (game_cam_con     && game_cam_con->IsVisible()) ||
+      // (game_aiConsole   && game_aiConsole->IsVisible());
   }
 }

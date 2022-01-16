@@ -10,7 +10,7 @@ namespace GOTHIC_ENGINE {
     oCWorldTimer* wldTimer = ogame->GetWorldTimer();
     int hour, min;
     wldTimer->GetTime( hour, min );
-    int day = wldTimer->GetDay();
+    int day = wldTimer->GetDay() + 1;
     return string::Combine( "Day: %i   Time: %i:%i", day, hour, min );
   }
 

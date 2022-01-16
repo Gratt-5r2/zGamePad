@@ -10,10 +10,12 @@ namespace GOTHIC_ENGINE {
   int Opt_ControllerScheme         = 0;
   float Opt_HintsIconScale         = 2.0;
   int Opt_HintsTransparency        = 185;
+  int Opt_MotionType               = 1;
   zSTRING Opt_QuickBar_Counts      = "4, 9";
   zSTRING Opt_QuickBar_TextureBase = "QUICKSLOT";
   zSTRING Opt_QuickBar_Offsets     = "1.3, 1.0";
   zSTRING Opt_UseItemError         = "You should be on the ground.";
+  bool Opt_NoDxMode                = false;
 
   void ApplyGamepadOptions();
 }

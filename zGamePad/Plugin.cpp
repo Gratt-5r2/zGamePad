@@ -23,10 +23,19 @@ namespace GOTHIC_ENGINE {
     return "...";
   }
 
+  void Game_PreLoop() {
+  }
+
 
   void Game_Loop() {
     FocusNpcLoop();
     OverlaysLoop();
+  }
+
+  void Game_PostLoop() {
+  }
+
+  void Game_MenuLoop() {
   }
 
 
@@ -106,7 +115,29 @@ namespace GOTHIC_ENGINE {
   void Game_Unpause() {
   }
   
+  void Menu_GetGamepadControlsList() {
+    static zSTRING list;
+    list.Clear();
+
+    for( uint i = 0; i < zTGamepadControlInfo::GamepadControlsList.GetNum(); i++ ) {
+      if( !list.IsEmpty() )
+        list += "|";
+      list += Z zTGamepadControlInfo::GamepadControlsList[i].StyleName;
+    }
+
+    zCParser::GetParser()->SetReturn( list );
+  }
+
   void Game_DefineExternals() {
+    // zCMenu::GetParser()->
+  }
+
+  void Game_ApplyOptions() {
+#if ENGINE >= Engine_G2
+    oCGame::s_bUseOldControls = True;
+#endif
+    ApplyGamepadOptions();
+    XInputDevice.UpdateControls();
   }
 
   /*
@@ -143,7 +174,10 @@ namespace GOTHIC_ENGINE {
     Enabled( AppDefault ) Game_Entry,
     Enabled( AppDefault ) Game_Init,
     Enabled( AppDefault ) Game_Exit,
+    Enabled( AppDefault ) Game_PreLoop,
     Enabled( AppDefault ) Game_Loop,
+    Enabled( AppDefault ) Game_PostLoop,
+    Enabled( AppDefault ) Game_MenuLoop,
     Enabled( AppDefault ) Game_SaveBegin,
     Enabled( AppDefault ) Game_SaveEnd,
     Enabled( AppDefault ) Game_LoadBegin_NewGame,
@@ -156,6 +190,7 @@ namespace GOTHIC_ENGINE {
     Enabled( AppDefault ) Game_LoadEnd_Trigger,
     Enabled( AppDefault ) Game_Pause,
     Enabled( AppDefault ) Game_Unpause,
-    Enabled( AppDefault ) Game_DefineExternals
+    Enabled( AppDefault ) Game_DefineExternals,
+    Enabled( AppDefault ) Game_ApplyOptions
   );
 }

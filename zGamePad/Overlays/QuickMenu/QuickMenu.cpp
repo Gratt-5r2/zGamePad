@@ -46,6 +46,7 @@ namespace GOTHIC_ENGINE {
 		SetFont( "FONT_OLD_20_WHITE.TGA" );
 
 		InsertChild( zCGamepadQuickBar_Items::GetInstance() );
+		// InsertChild( zCGamepadQuickKeys::GetInstance() ); // TODO
 		InsertChild( zCGamepadQuickBar_Weapons::GetInstance() );
 
 		LeftSide = new zCView();

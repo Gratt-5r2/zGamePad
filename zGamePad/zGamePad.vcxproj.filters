@@ -241,6 +241,9 @@
     <Filter Include="Plugin\Workspace\Gamepad\Options">
       <UniqueIdentifier>{bf72e7bf-573c-452c-bd55-8bd7c873cc53}</UniqueIdentifier>
     </Filter>
+    <Filter Include="Plugin\Workspace\Gamepad\Overlays\QuickKeys">
+      <UniqueIdentifier>{578842b8-2f27-4845-ad88-9b569db7a002}</UniqueIdentifier>
+    </Filter>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="Interface.cpp">
@@ -2864,6 +2867,18 @@
     <ClInclude Include="Options.cpp">
       <Filter>Plugin\Workspace\Gamepad\Options</Filter>
     </ClInclude>
+    <ClInclude Include="VectorMoving.cpp">
+      <Filter>Plugin\Workspace\Gamepad\Helpers</Filter>
+    </ClInclude>
+    <ClInclude Include="Overlays\QuickKeys\QuickKeys.cpp">
+      <Filter>Plugin\Workspace\Gamepad\Overlays\QuickKeys</Filter>
+    </ClInclude>
+    <ClInclude Include="Overlays\QuickKeys\QuickKeys.h">
+      <Filter>Plugin\Workspace\Gamepad\Overlays\QuickKeys</Filter>
+    </ClInclude>
+    <ClInclude Include="resource.h">
+      <Filter>Plugin\Workspace\Plugin</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <None Include=".build_settings.inl">
@@ -4741,5 +4756,13 @@
     <None Include="ZenGin\Gothic_UserAPI\zCLine2D.inl">
       <Filter>Engine SDK\User API\zEngine\L</Filter>
     </None>
+    <None Include="Plugin.patch">
+      <Filter>Plugin\Workspace\Plugin</Filter>
+    </None>
+  </ItemGroup>
+  <ItemGroup>
+    <ResourceCompile Include="resource.rc">
+      <Filter>Plugin\Workspace\Plugin</Filter>
+    </ResourceCompile>
   </ItemGroup>
 </Project>

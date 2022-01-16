@@ -2,6 +2,56 @@
 // Union SOURCE file
 
 namespace GOTHIC_ENGINE {
+  Array<zTGamepadControlInfo> zTGamepadControlInfo::GamepadControlsList;
+
+  void zTGamepadControlInfo::CreateGamepadControlsList() {
+    Array<string> namesList;
+
+    // Find physical control list
+    char** fileTable = Null;
+    long count = vdf_filelist_physical( fileTable );
+    for( long i = 0; i < count; i++ ) {
+      string fileName = fileTable[i];
+      if( fileName.EndWith( ".GAMEPAD" ) )
+        namesList |= fileName.GetWord( "\\" );
+    }
+
+    delete[] fileTable;
+
+    // Find virtual control list
+    count = vdf_filelist_physical( fileTable );
+    for( long i = 0; i < count; i++ ) {
+      string fileName = fileTable[i];
+      if( fileName.EndWith( ".GAMEPAD" ) )
+        namesList |= fileName.GetWord( "\\" );
+    }
+
+    delete[] fileTable;
+
+    for( uint i = 0; i < namesList.GetNum(); i++ ) {
+      XInputDevice.ParseControlFileStrings( namesList[i] );
+    }
+    // for( string fileName : namesList )
+    // XInputDevice.ParseControlFileStrings( fileName );
+  }
+
+  void zTGamepadControlInfo::RegisterStyleInfo( const string& fileName, const string& styleName ) {
+    uint index = GamepadControlsList.SearchEqual( fileName );
+    if( index == Invalid ) {
+      zTGamepadControlInfo& info = GamepadControlsList.Create();
+      info.FileName = fileName;
+      info.StyleName = styleName;
+    }
+  }
+
+  bool zTGamepadControlInfo::operator == ( const string& fileName ) const {
+    return FileName == fileName;
+  }
+
+
+
+
+
   Array<zTHelpString> zTHelpString::HelpStrings;
 
   zTHelpString::zTHelpString() {
@@ -234,11 +284,22 @@ namespace GOTHIC_ENGINE {
 
 
 
+  void zCXInputDevice::ParseControlsStyleName( const string& fileName, string row ) {
+    string text = row.GetWordSmart( 2 );
+    if( text == "\"" )
+      text = row.GetPattern( "\"", "\"" );
+    else
+      text = zTHelpString::GetString( text );
+
+    zTGamepadControlInfo::RegisterStyleInfo( fileName, text );
+  }
+
+
+
   bool zCXInputDevice::ParseControlFile() {
     // Check external control file
-    zSTRING defaultControlsFileName = "Controls.Gamepad";
     if( Opt_ControlsFile.IsEmpty() )
-      Opt_ControlsFile = defaultControlsFileName;
+      Opt_ControlsFile = "Controls.Gamepad";
 
     bool initialized = false;
     zTCombination combination;
@@ -296,6 +357,7 @@ namespace GOTHIC_ENGINE {
       else if( command == "Ita" )         ParseControlsStringText ( currentStringName, row );
       else if( command == "Cze" )         ParseControlsStringText ( currentStringName, row );
       else if( command == "Esp" )         ParseControlsStringText ( currentStringName, row );
+      else if( command == "ControlName" ) continue;
       else
         // unknown command !!!
         Message::Fatal( "Unknown control command: " + command );
@@ -304,6 +366,49 @@ namespace GOTHIC_ENGINE {
     // End last record
     if( initialized )
       ParseControlsEndRecord( combination );
+
+    return true;
+  }
+
+
+
+
+
+
+  bool zCXInputDevice::ParseControlFileStrings( const string& fileName ) {
+    string currentStringName;
+    string controlsFile;
+    if( !controlsFile.ReadFromVdf( fileName, VDF_DEFAULT | VDF_PHYSICALFIRST ) ) {
+      cmd << "Controls not found" << endl;
+      return false;
+    }
+
+    rowString controlsRows = controlsFile;
+
+    for( uint i = 0; i < controlsRows.GetNum(); i++ ) {
+      // Skip empty line
+      string& row = controlsRows[i];
+      if( row.Shrink().IsEmpty() )
+        continue;
+
+      // Skip comment line or blocks
+      string command = row.GetWordSmart( 1, true );
+      if( command == "//" || command.StartWith( "#" ) )
+        continue;
+
+           if( command == "String" )      ParseControlsStringName ( currentStringName, row );
+      else if( command == "Rus" )         ParseControlsStringText ( currentStringName, row );
+      else if( command == "Eng" )         ParseControlsStringText ( currentStringName, row );
+      else if( command == "Ger" )         ParseControlsStringText ( currentStringName, row );
+      else if( command == "Deu" )         ParseControlsStringText ( currentStringName, row );
+      else if( command == "Pol" )         ParseControlsStringText ( currentStringName, row );
+      else if( command == "Rou" )         ParseControlsStringText ( currentStringName, row );
+      else if( command == "Ita" )         ParseControlsStringText ( currentStringName, row );
+      else if( command == "Cze" )         ParseControlsStringText ( currentStringName, row );
+      else if( command == "Esp" )         ParseControlsStringText ( currentStringName, row );
+      else if( command == "ControlName" ) ParseControlsStyleName  ( fileName, row );
+      else continue;
+    }
 
     return true;
   }

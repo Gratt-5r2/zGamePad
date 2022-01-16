@@ -39,14 +39,14 @@ namespace GOTHIC_ENGINE {
 		if( !player || player->IsDead() || !player->IsHuman() )
 			return;
 
-		static zCGamepadQuickMenu* quickMenu = zCGamepadQuickMenu::GetInstance();
+		static zCGamepadQuickMenu* quickMenu			 = zCGamepadQuickMenu::GetInstance();
 		static zCGamepadControlsHelp* controlsHelp = zCGamepadControlsHelp::GetInstance();
-		static zCGamepadQuickBar_Items* itemsRing = zCGamepadQuickBar_Items::GetInstance();
+		static zCGamepadQuickBar_Items* itemsRing  = zCGamepadQuickBar_Items::GetInstance();
 
-		if( zKeyToggled( KEY_3 ) )
+		if( !Cond_ConsoleIsOpen() && zKeyToggled( KEY_3 ) )
 			if( !player->inventory2.IsOpen() )
 				quickMenu->Show( screen );
 
-		controlsHelp->Top();
+		// controlsHelp->Top();
 	}
 }

@@ -100,7 +100,7 @@ namespace GOTHIC_ENGINE {
       int backSX   = fontX;
       int backSY   = fontY;
       int backPX   = startPosX - fontX - spriteSX * (int&)keysNum;
-      int backPY   = 7200 - fontY * e++;
+      int backPY   = 7200 - fontY * 1.2f * e++;
 
       Background->ClrPrintwin();
       Background->SetSize( backSX, backSY );

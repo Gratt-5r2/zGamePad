@@ -5,8 +5,18 @@ namespace GOTHIC_ENGINE {
 #define STICK_MAX   32768
 #define STICK_MAX_D 32768.0
 #define STICK_MAX_F 32768.0f
+#define DEADZONE_L  15000.0f
 #define DEADZONE_R  10000.0f
 
+  struct zTGamepadControlInfo {
+    string FileName;
+    string StyleName;
+    bool operator == ( const string& fileName ) const;
+
+    static void CreateGamepadControlsList();
+    static Array<zTGamepadControlInfo> GamepadControlsList;
+    static void RegisterStyleInfo( const string& fileName, const string& styleName );
+  };
 
   typedef bool(*LPCONDFUNC)();
   typedef int JOYKEY, DXKEY;
@@ -123,13 +133,18 @@ namespace GOTHIC_ENGINE {
   class zCXInputDevice {
     friend class zCInput_Win32;
     friend class zCGamepadSpellBook;
+    friend class zTGamepadControlInfo;
 
+    string FileName;
+    JOYKEY KeyStatesReal;
     JOYKEY KeyStates;
     zTStickState LeftStick;
     zTStickState RightStick;
     int LeftTrigger;
     int RightTrigger;
     bool DeviceConnected;
+    bool StrafePressed;
+    bool WalkBack;
 
     void InitCombinations();
     void UpdateVibration();
@@ -140,13 +155,15 @@ namespace GOTHIC_ENGINE {
     void UpdateLastKeyState();
     bool ForceVideoSkipping();
     bool ParseControlFile();
+    bool ParseControlFileStrings( const string& fileName );
     void ParseControlsCombination( zTCombination& combination, string row );
     void ParseControlsEmulation( zTCombination& combination, string row );
     void ParseControlsEndRecord( zTCombination& combination );
     void ParseControlsCondition( zTCombination& combination, string row );
     void ParseControlsHelp( zTCombination& combination, string row );
     void ParseControlsStringName( string& stringName, string row );
-    void ParseControlsStringText( string& stringName, string row );
+    void ParseControlsStyleName( const string& fileName, string row );
+    static void ParseControlsStringText( string& stringName, string row );
     void DisplayDisconnect();
     Array<zTCombination> KeyCombinations;
     zTVibrationMessage VibrationMessage;
@@ -164,6 +181,9 @@ namespace GOTHIC_ENGINE {
     bool IsBatteryLow();
     bool IsConnected();
     bool HasToggledKeys( JOYKEY& keys );
+    bool JoyPressed( const JOYKEY& keys );
+    bool StrafeButtonIsPressed();
+    bool IsBacKWalk();
     void GetStickStatesSquare( zTStickState& stateLeft, zTStickState& stateRight );
     void GetStickStatesCircle( zTStickState& stateLeft, zTStickState& stateRight );
     ~zCXInputDevice();
@@ -210,6 +230,7 @@ namespace GOTHIC_ENGINE {
   bool Cond_HasLeftContainer();
   bool Cond_UsesPicklock();
   bool Cond_IsOnTrade();
+  bool Cond_ConsoleIsOpen();
 
 
 

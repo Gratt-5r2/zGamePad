@@ -2,7 +2,7 @@
 // Union SOURCE file
 
 namespace GOTHIC_ENGINE {
-  HOOK Hook_oCAIHuman_WeaponChoose AS( &oCAIHuman::WeaponChoose, &oCAIHuman::WeaponChoose_Union );
+  HOOK Hook_oCAIHuman_WeaponChoose PATCH( &oCAIHuman::WeaponChoose, &oCAIHuman::WeaponChoose_Union );
 
   void oCAIHuman::WeaponChoose_Union() {
     if( Pressed( GAME_WEAPON ) ) {
@@ -31,8 +31,9 @@ namespace GOTHIC_ENGINE {
     }
 
     THISCALL( Hook_GetMousePos )(x, y, z);
-    x += ((float)XInputDevice.RightStick.X) /  3000.0f * Opt_StickSensitivity;
-    y += ((float)XInputDevice.RightStick.Y) / -3000.0f * Opt_StickSensitivity;
+    float motionFactor = Opt_NoDxMode ? ztimer->frameTimeFloat : 1.0f;
+    x += ((float)XInputDevice.RightStick.X) /  3000.0f * (Opt_StickSensitivity * motionFactor);
+    y += ((float)XInputDevice.RightStick.Y) / -3000.0f * (Opt_StickSensitivity * motionFactor);
 
     if( rollbackSensitivity < 1.0f ) {
       if( abs( x + y ) > 0.3f ) {
@@ -60,7 +61,7 @@ namespace GOTHIC_ENGINE {
   // void zCCamera::PreRenderProcessing()
   void __fastcall zCCamera_PreRenderProcessing( zCCamera* _this, void* vt );
 
-  HOOK Hook_zCCamera_PreRenderProcessing AS( &zCCamera::PreRenderProcessing, &zCCamera_PreRenderProcessing );
+  HOOK Hook_zCCamera_PreRenderProcessing PATCH( &zCCamera::PreRenderProcessing, &zCCamera_PreRenderProcessing );
 
   void __fastcall zCCamera_PreRenderProcessing( zCCamera* _this, void* vt ) {
     if( _this->tremorScale >= 0.0001 )
@@ -126,13 +127,13 @@ namespace GOTHIC_ENGINE {
 
 
   // void __thiscall CGameManager::ApplySomeSettings(void)
-  HOOK Hook_CGameManager_ApplySomeSettings AS( &CGameManager::ApplySomeSettings, &CGameManager::ApplySomeSettings_Union );
-
-  void CGameManager::ApplySomeSettings_Union() {
-    THISCALL( Hook_CGameManager_ApplySomeSettings) ();
-    ApplyGamepadOptions();
-    XInputDevice.UpdateControls();
-  }
+  // HOOK Hook_CGameManager_ApplySomeSettings AS( &CGameManager::ApplySomeSettings, &CGameManager::ApplySomeSettings_Union );
+  // 
+  // void CGameManager::ApplySomeSettings_Union() {
+  //   THISCALL( Hook_CGameManager_ApplySomeSettings) ();
+  //   ApplyGamepadOptions();
+  //   XInputDevice.UpdateControls();
+  // }
 
 
 
@@ -150,15 +151,10 @@ namespace GOTHIC_ENGINE {
 
   int oCAIHuman::IsOnFightAni() {
     return
-#if ENGINE < Engine_G2
       !LogicalKeyPressed( GAME_UP ) &&
       ( IsStateAniActive( _t_hitf ) ||
         IsStateAniActive( _t_hitl ) ||
         IsStateAniActive( _t_hitr ) );
-#else
-      IsStateAniActive( _t_hitl ) ||
-      IsStateAniActive( _t_hitr );
-#endif
   }
 
 
@@ -223,6 +219,9 @@ namespace GOTHIC_ENGINE {
       return True;
     }
 
+#if ENGINE == Engine_G1
+    _asm mov edi, esi
+#endif
     return THISCALL( Hook_oCNpcInventory_HandleEvent )(key);
   }
 
