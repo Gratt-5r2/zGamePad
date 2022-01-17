@@ -445,8 +445,17 @@ namespace GOTHIC_ENGINE {
 
 
   void zCXInputDevice::UpdateRightSticksState() {
-    LeftTrigger  = Gamepad.Gamepad.bLeftTrigger;
-    RightTrigger = Gamepad.Gamepad.bRightTrigger;
+
+    if (!DeviceConnected)
+    {
+        LeftTrigger = DS4Device.GetLeftTrigger();
+        RightTrigger = DS4Device.GetRightTrigger();
+    }
+    else
+    {
+        LeftTrigger = Gamepad.Gamepad.bLeftTrigger;
+        RightTrigger = Gamepad.Gamepad.bRightTrigger;
+    }
 
     if( LeftTrigger > 50 )
       KeyStates |= GameParade;
@@ -543,23 +552,16 @@ namespace GOTHIC_ENGINE {
     bool DSInputDisconnected = !DS4Device.CheckConnection();
     bool XInputDisconnected = XINPUTGETSTATE(Opt_ControllerID, &Gamepad) == ERROR_DEVICE_NOT_CONNECTED;
 
+    DeviceConnected = !XInputDisconnected;
+    DS4Device.SetConnected(!DSInputDisconnected);
+
     if(XInputDisconnected && DSInputDisconnected) {
       if (DeviceConnected || DS4Device.IsConnected()) {
             DisplayDisconnect();
       }
-      DeviceConnected = false;
       return;
     }
     
-    
-    if (!XInputDisconnected && !DeviceConnected) {
-        DeviceConnected = true;
-    }
-
-    if (!DSInputDisconnected && !DS4Device.IsConnected()) {
-        DS4Device.SetConnected(true);
-    }
-
     if (!DeviceConnected) {
         DS4Device.UpdateState();
         KeyStates = DS4Device.GetKeyState();
