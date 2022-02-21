@@ -384,7 +384,7 @@ namespace GOTHIC_ENGINE {
   extern void SetHeadingToEnemy( oCNpc* killer, oCNpc* enemy );
 
   void zCVob::DoFrameActivity_Union() {
-    CanTurnThisModel = this == player;
+    CanTurnThisModel = this == player && !ogame->pause_screen;
     THISCALL( Hook_zCVob_DoFrameActivity )();
     if( CanTurnThisModel ) {
       bool strafe = XInputDevice.StrafeButtonIsPressed();
