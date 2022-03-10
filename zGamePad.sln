@@ -17,6 +17,7 @@ Global
 		G2A Release|x86 = G2A Release|x86
 		MP Debug|x86 = MP Debug|x86
 		MP Release|x86 = MP Release|x86
+		MTx4 Release|x86 = MTx4 Release|x86
 	EndGlobalSection
 	GlobalSection(ProjectConfigurationPlatforms) = postSolution
 		{458A241C-AB96-4648-983F-348E01268587}.G1 Debug|x86.ActiveCfg = G1 Debug|Win32
@@ -39,6 +40,8 @@ Global
 		{458A241C-AB96-4648-983F-348E01268587}.MP Debug|x86.Build.0 = MP Debug|Win32
 		{458A241C-AB96-4648-983F-348E01268587}.MP Release|x86.ActiveCfg = MP Release|Win32
 		{458A241C-AB96-4648-983F-348E01268587}.MP Release|x86.Build.0 = MP Release|Win32
+		{458A241C-AB96-4648-983F-348E01268587}.MTx4 Release|x86.ActiveCfg = MTx4 Release|Win32
+		{458A241C-AB96-4648-983F-348E01268587}.MTx4 Release|x86.Build.0 = MTx4 Release|Win32
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
