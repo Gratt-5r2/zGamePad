@@ -9,6 +9,8 @@ using namespace Gdiplus;
 #pragma comment (lib,"Xinput.lib")
 #include <math.h>
 
+#include "JoyShockLibrary.h"
+#pragma comment (lib,"lib/JoyShockLibrary.lib")
 
 // Check executed engine with current source code
 #define CHECK_THIS_ENGINE (Union.GetEngineVersion() == ENGINE)

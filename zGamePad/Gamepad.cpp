@@ -391,8 +391,17 @@ namespace GOTHIC_ENGINE {
     timer.ClearUnused();
 
     // Maximum of Triggers or Sticks - 65536
-    LeftStick.X   = Gamepad.Gamepad.sThumbLX;
-    LeftStick.Y   = Gamepad.Gamepad.sThumbLY;
+    if (!DeviceConnected)
+    {
+        LeftStick.X = DS4Device.GetLeftStick().X;
+        LeftStick.Y = DS4Device.GetLeftStick().Y;
+    }
+    else
+    {
+        LeftStick.X = Gamepad.Gamepad.sThumbLX;
+        LeftStick.Y = Gamepad.Gamepad.sThumbLY;
+    }
+
     int length    = sqrti( LeftStick.X * LeftStick.X + LeftStick.Y * LeftStick.Y );
     StrafePressed = false;
 
@@ -436,8 +445,17 @@ namespace GOTHIC_ENGINE {
 
 
   void zCXInputDevice::UpdateRightSticksState() {
-    LeftTrigger  = Gamepad.Gamepad.bLeftTrigger;
-    RightTrigger = Gamepad.Gamepad.bRightTrigger;
+
+    if (!DeviceConnected)
+    {
+        LeftTrigger = DS4Device.GetLeftTrigger();
+        RightTrigger = DS4Device.GetRightTrigger();
+    }
+    else
+    {
+        LeftTrigger = Gamepad.Gamepad.bLeftTrigger;
+        RightTrigger = Gamepad.Gamepad.bRightTrigger;
+    }
 
     if( LeftTrigger > 50 )
       KeyStates |= GameParade;
@@ -466,8 +484,18 @@ namespace GOTHIC_ENGINE {
       UpdateRightSticksState();
 
     // Dive inverse
-    int leftStick  = (diveMode ? Gamepad.Gamepad.sThumbLX : Gamepad.Gamepad.sThumbRX);
-    int rightStick = (diveMode ? Gamepad.Gamepad.sThumbLY : Gamepad.Gamepad.sThumbRY);
+    int leftStick, rightStick;
+
+    if (!DeviceConnected)
+    {
+        leftStick = (diveMode ? DS4Device.GetLeftStick().X : DS4Device.GetRightStick().X);
+        rightStick = (diveMode ? DS4Device.GetLeftStick().Y : DS4Device.GetRightStick().Y);
+    }
+    else
+    {
+        leftStick = (diveMode ? Gamepad.Gamepad.sThumbLX : Gamepad.Gamepad.sThumbRX);
+        rightStick = (diveMode ? Gamepad.Gamepad.sThumbLY : Gamepad.Gamepad.sThumbRY);
+    }
 
     RightStick.X = abs( leftStick  ) > DEADZONE_R ? leftStick  : 0;
     RightStick.Y = abs( rightStick ) > DEADZONE_R ? rightStick : 0;
@@ -521,17 +549,27 @@ namespace GOTHIC_ENGINE {
     if( !zinput )
       return;
 
-    if( XINPUTGETSTATE( Opt_ControllerID, &Gamepad ) == ERROR_DEVICE_NOT_CONNECTED ) {
-      if( DeviceConnected )
-        DisplayDisconnect();
+    bool DSInputDisconnected = !DS4Device.CheckConnection();
+    bool XInputDisconnected = XINPUTGETSTATE(Opt_ControllerID, &Gamepad) == ERROR_DEVICE_NOT_CONNECTED;
 
-      DeviceConnected = false;
+    DeviceConnected = !XInputDisconnected;
+    DS4Device.SetConnected(!DSInputDisconnected);
+
+    if(XInputDisconnected && DSInputDisconnected) {
+      if (DeviceConnected || DS4Device.IsConnected()) {
+            DisplayDisconnect();
+      }
       return;
     }
-    else if( !DeviceConnected )
-      DeviceConnected = true;
-
-    KeyStates = Gamepad.Gamepad.wButtons;
+    
+    if (!DeviceConnected) {
+        DS4Device.UpdateState();
+        KeyStates = DS4Device.GetKeyState();
+    }
+    else {
+        KeyStates = Gamepad.Gamepad.wButtons;
+    }
+    
     UpdateSticksState();
     KeyStatesReal = KeyStates;
 
@@ -593,8 +631,17 @@ namespace GOTHIC_ENGINE {
 
 
   void zCXInputDevice::UpdateLastKeyState() {
-    for( uint i = 0; i < KeyCombinations.GetNum(); i++ )
-      KeyCombinations[i].KeyStates = Gamepad.Gamepad.wButtons;
+      if (!DeviceConnected)
+      {
+          WORD DSKeyState = DS4Device.GetKeyState();
+          for (uint i = 0; i < KeyCombinations.GetNum(); i++)
+              KeyCombinations[i].KeyStates = DSKeyState;
+      }
+      else
+      {
+          for (uint i = 0; i < KeyCombinations.GetNum(); i++)
+              KeyCombinations[i].KeyStates = Gamepad.Gamepad.wButtons;
+      }
   }
 
 
