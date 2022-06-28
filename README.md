@@ -1,4 +1,4 @@
-# Use all the features of the gamepad.
+# Use all features of your gamepad.
 
 ### To customize the gamepad, see [wiki](https://github.com/Gratt-5r2/zGamePad/wiki)
 
