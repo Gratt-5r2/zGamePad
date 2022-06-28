@@ -3,11 +3,15 @@
 
 namespace GOTHIC_ENGINE {
   void Game_Entry() {
-      DS4Device.InitDevice();
+    DS4Device.InitDevice();
   }
 
+
+
+
   void Game_Init() {
-    ApplyGamepadOptions();
+    // ApplyGamepadOptions();
+    XInputDevice.UpdateControls();
   }
 
   void Game_Exit() {
@@ -27,8 +31,14 @@ namespace GOTHIC_ENGINE {
   void Game_PreLoop() {
   }
 
+  static int s_bUseOldControls_Real = 0;
 
   void Game_Loop() {
+#if ENGINE >= Engine_G2
+    if( !s_bUseOldControls_Real && keybuffer.GetNum() )
+      oCGame::s_bUseOldControls = XInputDevice.HasGamepadInput();
+#endif
+
     FocusNpcLoop();
     OverlaysLoop();
   }
@@ -39,8 +49,6 @@ namespace GOTHIC_ENGINE {
   void Game_MenuLoop() {
   }
 
-
-
   // Information about current saving or loading world
   TSaveLoadGameInfo& SaveLoadGameInfo = UnionCore::SaveLoadGameInfo;
 
@@ -48,6 +56,8 @@ namespace GOTHIC_ENGINE {
   }
 
   void Game_SaveEnd() {
+    zLastSaveInfo::GetInstance().UpdateSaveSlotNr( SaveLoadGameInfo.slotID );
+
     zSTRING savePath = ogame->CreateSavePath( "GAMEPAD_QUICKBAR.SAV" );
     zCArchiver* archiver = zarcFactory->CreateArchiverWrite( savePath, zARC_MODE_ASCII, 0, 0 );
     if( !archiver )
@@ -56,6 +66,10 @@ namespace GOTHIC_ENGINE {
     zCGamepadQuickBar_Items::GetInstance()->Archive( *archiver );
     archiver->Close();
     archiver->Release();
+
+    if( oCNpc::s_bTargetLocked ) {
+      player->SetEnemy( player->GetFocusNpc() );
+    }
   }
 
   void LoadBegin() {
@@ -116,29 +130,14 @@ namespace GOTHIC_ENGINE {
   void Game_Unpause() {
   }
   
-  void Menu_GetGamepadControlsList() {
-    static zSTRING list;
-    list.Clear();
-
-    for( uint i = 0; i < zTGamepadControlInfo::GamepadControlsList.GetNum(); i++ ) {
-      if( !list.IsEmpty() )
-        list += "|";
-      list += Z zTGamepadControlInfo::GamepadControlsList[i].StyleName;
-    }
-
-    zCParser::GetParser()->SetReturn( list );
-  }
-
   void Game_DefineExternals() {
-    // zCMenu::GetParser()->
   }
 
   void Game_ApplyOptions() {
-#if ENGINE >= Engine_G2
-    oCGame::s_bUseOldControls = True;
-#endif
     ApplyGamepadOptions();
-    XInputDevice.UpdateControls();
+#if ENGINE >= Engine_G2
+    s_bUseOldControls_Real = oCGame::s_bUseOldControls;
+#endif
   }
 
   /*

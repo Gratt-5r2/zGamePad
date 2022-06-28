@@ -17,8 +17,10 @@
 #include "ControlOverrides.cpp"
 #include "FocusNpc.cpp"
 #include "Hooks.cpp"
+#include "QuickSaves.cpp"
 #include "SaveMenu.cpp"
 #include "VectorMoving.cpp"
+#include "Version.cpp"
 #include "Plugin.cpp"
 #pragma endregion
 

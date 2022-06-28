@@ -7,6 +7,7 @@
 #include "Gamepad.h"
 #include "DSGamepad.h"
 #include "ControlParser.h"
+#include "QuickSaves.h"
 #include "Overlays/GamepadOverlay.h"
 #include "Overlays/QuickBar/QuickBar.h"
 #include "Overlays/QuickMenu/QuickMenu.h"

@@ -448,8 +448,8 @@ namespace GOTHIC_ENGINE {
 
     if (!DeviceConnected)
     {
-        LeftTrigger = DS4Device.GetLeftTrigger();
-        RightTrigger = DS4Device.GetRightTrigger();
+        LeftTrigger = (int)DS4Device.GetLeftTrigger();
+        RightTrigger = (int)DS4Device.GetRightTrigger();
     }
     else
     {
@@ -736,6 +736,26 @@ namespace GOTHIC_ENGINE {
     squareY = double( RightStick.Y ) / STICK_MAX_D;
     stateRight.X = int( squareX * sqrt( 1.0 - pow( squareY, 2 ) * 0.5 ) * STICK_MAX_D );
     stateRight.Y = int( squareY * sqrt( 1.0 - pow( squareX, 2 ) * 0.5 ) * STICK_MAX_D );
+  }
+
+
+
+  bool zCXInputDevice::HasGamepadInput() {
+    if( KeyStatesReal != 0 )
+      return true;
+
+    if( LeftTrigger != 0 || RightTrigger != 0 )
+      return true;
+
+    int leftStickLength = sqrti( LeftStick.X * LeftStick.X + LeftStick.Y * LeftStick.Y );
+    if( leftStickLength > DEADZONE_L )
+      return true;
+
+    int rightStickLength = sqrti( RightStick.X * RightStick.X + RightStick.Y * RightStick.Y );
+    if( rightStickLength > DEADZONE_R )
+      return true;
+
+    return false;
   }
 
 

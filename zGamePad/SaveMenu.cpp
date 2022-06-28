@@ -4,8 +4,6 @@
 namespace GOTHIC_ENGINE {
   HOOK Ivk_zCMenuItem_Input AS( &zCMenuItem::Input, &zCMenuItem::Input_Union );
 
-
-
   string GetWorldTimeString() {
     oCWorldTimer* wldTimer = ogame->GetWorldTimer();
     int hour, min;
@@ -13,7 +11,6 @@ namespace GOTHIC_ENGINE {
     int day = wldTimer->GetDay() + 1;
     return string::Combine( "Day: %i   Time: %i:%i", day, hour, min );
   }
-
 
 
   int zCMenuItem::Input_Union( int length, zSTRING& output ) {
@@ -31,8 +28,6 @@ namespace GOTHIC_ENGINE {
         return confirm;
       }
     }
-
-
 
     return THISCALL( Ivk_zCMenuItem_Input )(length, output);
   }

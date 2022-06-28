@@ -28,6 +28,7 @@ oCNpc* oCNpc::GetNearestFightNpcRight_Union();
 oCNpc* oCNpc::GetNearestFightNpcLeft_Union();
 oCNpc* oCNpc::GetNearestFightNpc_Union();
 int CanInterruptAttack();
+int EV_DrawWeapon_Union( oCMsgWeapon* );
 
 #if ENGINE == Engine_G2
 int IsDead() { return attribute[NPC_ATR_HITPOINTS] <= 0; }

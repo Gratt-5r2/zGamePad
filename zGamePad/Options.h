@@ -16,6 +16,7 @@ namespace GOTHIC_ENGINE {
   zSTRING Opt_QuickBar_Offsets     = "1.3, 1.0";
   zSTRING Opt_UseItemError         = "You should be on the ground.";
   bool Opt_NoDxMode                = false;
+  int Opt_QuickSaveMode            = 0;
 
   void ApplyGamepadOptions();
 }

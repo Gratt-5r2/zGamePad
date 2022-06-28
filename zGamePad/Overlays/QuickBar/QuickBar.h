@@ -17,10 +17,12 @@ namespace GOTHIC_ENGINE {
 		zCView* Background_Highlight;
 		zCView* ItemRenderer;
 		zCView* Foreground;
+		zCOLOR Color;
 
 		zTGamepadQuickBarCell();
 		void SetItem( oCItem* item );
 		void SetViewport( const int& px, const int& py, const int& sx, const int& sy );
+		void SetColor( const zCOLOR& color );
 	};
 
 
@@ -53,6 +55,7 @@ namespace GOTHIC_ENGINE {
 		virtual void Show( zCView* parent );
 		virtual void ShowAt( zCView* parent, const zEGamepadQuickBarAlignment& align = zEGamepadQuickBarAlignment_Right );
 		virtual void Close();
+		virtual void ChangeColor( const zCOLOR& color );
 		virtual int HandleEvent( int key );
 
 		static float HighlightAlpha;

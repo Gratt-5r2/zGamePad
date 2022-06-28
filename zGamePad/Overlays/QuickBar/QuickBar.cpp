@@ -35,6 +35,17 @@ namespace GOTHIC_ENGINE {
   }
 
 
+  void zTGamepadQuickBarCell::SetColor( const zCOLOR& col ) {
+    Color = col;
+    Background->SetColor( col );
+    ItemRenderer->SetColor( col );
+    Foreground->SetColor( col );
+    Background_Highlight->color.r = max( col.r, 135 );
+    Background_Highlight->color.g = max( col.g, 135 );
+    Background_Highlight->color.b = max( col.b, 135 );
+  }
+
+
 
 
 
@@ -266,6 +277,8 @@ namespace GOTHIC_ENGINE {
   static zCOLOR SelectedCellColor = zCOLOR( 255, 110, 110 );
 
   void zCGamepadQuickBar::BlitCells() {
+    // SetDaylightColor();
+
     static zCWorld* wld  = zfactory->CreateWorld();
     float highlightAlpha = sin(((float)Timer::GetTime()) * 0.01f) * 40.0f;
 
@@ -289,8 +302,16 @@ namespace GOTHIC_ENGINE {
           InsertItem( cell.Background_Highlight );
 
         if( NeedToMarkEquipedItems ) {
-          cell.Background->color = item && item->HasFlag( ITM_FLAG_ACTIVE ) ?
-            SelectedCellColor : GFX_WHITE;
+          if( item && item->HasFlag( ITM_FLAG_ACTIVE ) ) {
+            zCOLOR color = OverlayedColor;
+            color.r = OverlayedColor.r;
+            color.g = OverlayedColor.g / 2;
+            color.b = OverlayedColor.b / 2;
+            color.alpha = OverlayedColor.alpha;
+            cell.Background->color = color;
+          }
+          else
+            cell.Background->color = OverlayedColor;
         }
 
         cell.Background->Blit();
@@ -435,6 +456,19 @@ namespace GOTHIC_ENGINE {
     CloseCells();
     IsOpened = False;
     Parent = Null;
+  }
+
+
+
+  void zCGamepadQuickBar::ChangeColor( const zCOLOR& color ) {
+
+    zCGamepadOverlay::ChangeColor( color );
+
+    for( uint i = 0; i < Rings.GetNum(); i++ ) {
+      auto& layers = Rings[i];
+      for( uint j = 0; j < layers.GetNum(); j++ )
+        layers[j].SetColor( color );
+    }
   }
 
 

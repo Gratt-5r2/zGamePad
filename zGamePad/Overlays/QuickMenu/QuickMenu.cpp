@@ -58,6 +58,7 @@ namespace GOTHIC_ENGINE {
 
 
 	void zCGamepadQuickMenu::Blit() {
+		// SetDaylightColor();
     zCView::Blit();
 
 #if ENGINE < Engine_G2
@@ -181,6 +182,25 @@ namespace GOTHIC_ENGINE {
 		zCGamepadOverlay::RemoveChild( overlay );
 	}
 
+
+
+	void zCGamepadQuickMenu::ChangeColor( const zCOLOR& color ) {
+		zCGamepadOverlay::ChangeColor( color );
+		LeftSide->SetColor( color );
+		for( uint i = 0; i < Selectors.GetNum(); i++ ) {
+			Selectors[i]->SetColor( color );
+			auto* textLine = Selectors[i]->textLines.GetNextInList();
+			while( textLine ) {
+				zCViewText* textData = textLine->GetData();
+				textData->color = color;
+				textLine = textLine->GetNextInList();
+			}
+		}
+
+		if( ActiveOverlay )
+			ActiveOverlay->ChangeColor( color );
+	}
+
 	
 
 
@@ -221,9 +241,13 @@ namespace GOTHIC_ENGINE {
 			return;
 		}
 
+		static oCMsgManipulate* useItem = Null;
+		if( useItem && npc->GetEM()->messageList.IsInList( useItem ) )
+			return;
+
 		oCMsgMovement* standUp = new oCMsgMovement( oCMsgMovement::EV_STANDUP, 0 );
 		oCMsgWeapon* removeWeaponMsg = new oCMsgWeapon( oCMsgWeapon::EV_REMOVEWEAPON, 0, 0 );
-		oCMsgManipulate* useItem = !item->GetSchemeName().IsEmpty() ?
+		useItem = !item->GetSchemeName().IsEmpty() ?
 			new oCMsgManipulate( oCMsgManipulate::EV_USEITEMTOSTATE, item, npc->interactItemCurrentState + 1 ) :
 			new oCMsgManipulate( oCMsgManipulate::EV_EQUIPITEM, item, 0 );
 

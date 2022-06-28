@@ -50,7 +50,7 @@ namespace GOTHIC_ENGINE {
   }
 
   static bool PlayerIsMonster() {
-    return player->IsHuman() == False && player->IsSkeleton() == False && player->IsOrc();
+    return player->IsHuman() == False && player->IsSkeleton() == False && player->IsOrc() == False;
   }
 
   static void TurnBody( zCModel* model, float angle ) {
@@ -182,7 +182,7 @@ namespace GOTHIC_ENGINE {
 
     zTStickState left, right;
     XInputDevice.GetStickStatesSquare( left, right );
-    zVEC2 direction = zVEC2( left.X, left.Y ).Normalize();
+    zVEC2 direction = zVEC2( (float)left.X, (float)left.Y ).Normalize();
 
     float angleRad = direction.GetAngle();
     if( angleRad > RAD180 )
@@ -299,6 +299,9 @@ namespace GOTHIC_ENGINE {
       return;
 
     model->vobTrans.RotateXZ( GetBodyAngle() );
+    oCNpc* npc = model->homeVob->CastTo<oCNpc>();
+    if( npc )
+      npc->UpdateSlots();
   }
 
   void TurnPlayerBody2( zCModel* model ) {
@@ -306,6 +309,9 @@ namespace GOTHIC_ENGINE {
       return;
 
     TurnBody( model, GetBodyAngle() * DEGREE );
+    oCNpc* npc = model->homeVob->CastTo<oCNpc>();
+    if( npc )
+      npc->UpdateSlots();
   }
 
 
@@ -478,7 +484,7 @@ namespace GOTHIC_ENGINE {
       oldAngle              = angle;
 
       float autoRollMult = BodyAngle * 3.0f;
-      zClamp( autoRollMult, -PI / 2, +PI / 2 );
+      zClamp( autoRollMult, -PI * 0.5f, +PI * 0.5f );
       autoRollMult = 1.0f - abs( sin( autoRollMult ) );
 
       algleSeeked = Alg_SafeDiv( rotation * 100.0f, ztimer->frameTimeFloat ) * autoRollMult;

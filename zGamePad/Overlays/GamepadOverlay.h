@@ -7,14 +7,17 @@ namespace GOTHIC_ENGINE {
 		zCView* Parent;
 		Array<zCGamepadOverlay*> Childs;
 		bool IsOpened;
+		zCOLOR OverlayedColor;
 	public:
 
 		zCGamepadOverlay();
 		bool Opened();
-		virtual void Show( zCView* parent ) = 0;
+		void SetDaylightColor();
+		virtual void Show( zCView* parent );
 		virtual void Close() = 0;
 		virtual void InsertChild( zCGamepadOverlay* overlay );
 		virtual void RemoveChild( zCGamepadOverlay* overlay );
+		virtual void ChangeColor( const zCOLOR& color );
 		virtual string GetDescription();
 	};
 }

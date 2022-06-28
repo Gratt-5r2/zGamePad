@@ -6,3 +6,4 @@
 void GameInit_Union();
 void Init_Union( HWND& );
 void ApplySomeSettings_Union();
+void Menu_Union( int );

@@ -3,3 +3,4 @@
 // User API for oCPortalRoomManager
 // Add your methods here
 
+bool IsNpcInRoom( oCNpc* npc );

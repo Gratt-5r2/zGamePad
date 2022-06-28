@@ -24,6 +24,7 @@ namespace GOTHIC_ENGINE {
 
 
   struct zTCombination {
+    string              Id;
     Array<JOYKEY>       Combination;
     Array<DXKEY>        Emulation;
     Array<bool (*)()>   AllowConditions;
@@ -154,8 +155,9 @@ namespace GOTHIC_ENGINE {
     void UpdateKeyState();
     void UpdateLastKeyState();
     bool ForceVideoSkipping();
-    bool ParseControlFile();
+    bool ParseControlFile( const string& fileName );
     bool ParseControlFileStrings( const string& fileName );
+    void ParseControlsId( zTCombination& combination, string row );
     void ParseControlsCombination( zTCombination& combination, string row );
     void ParseControlsEmulation( zTCombination& combination, string row );
     void ParseControlsEndRecord( zTCombination& combination );
@@ -186,6 +188,7 @@ namespace GOTHIC_ENGINE {
     bool IsBacKWalk();
     void GetStickStatesSquare( zTStickState& stateLeft, zTStickState& stateRight );
     void GetStickStatesCircle( zTStickState& stateLeft, zTStickState& stateRight );
+    bool HasGamepadInput();
     ~zCXInputDevice();
   };
 

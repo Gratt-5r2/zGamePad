@@ -247,6 +247,9 @@
     <Filter Include="Plugin\Workspace\Gamepad\Osmith">
       <UniqueIdentifier>{b919ea27-b632-4b27-911f-d6f29418aaf2}</UniqueIdentifier>
     </Filter>
+    <Filter Include="Plugin\Workspace\Gamepad\QuickSaves">
+      <UniqueIdentifier>{b5f7c85f-342a-444d-846a-0eb05ddf6994}</UniqueIdentifier>
+    </Filter>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="Interface.cpp">
@@ -2889,6 +2892,15 @@
       <Filter>Plugin\Workspace\Gamepad\Osmith</Filter>
     </ClInclude>
     <ClInclude Include="JoyShockLibrary.h" />
+    <ClInclude Include="QuickSaves.h">
+      <Filter>Plugin\Workspace\Gamepad\QuickSaves</Filter>
+    </ClInclude>
+    <ClInclude Include="QuickSaves.cpp">
+      <Filter>Plugin\Workspace\Gamepad\QuickSaves</Filter>
+    </ClInclude>
+    <ClInclude Include="Version.cpp">
+      <Filter>Plugin\Workspace\Plugin</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <None Include=".build_settings.inl">

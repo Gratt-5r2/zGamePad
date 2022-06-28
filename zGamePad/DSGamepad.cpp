@@ -30,12 +30,12 @@ namespace GOTHIC_ENGINE {
 		{
 			KeyStates = GamepadState.buttons;
 
-			LeftStick.X = GamepadState.stickLX * 32767;
-			LeftStick.Y = GamepadState.stickLY * 32767;
-			RightStick.X = GamepadState.stickRX * 32767;
-			RightStick.Y = GamepadState.stickRY * 32767;
-			LeftTrigger = GamepadState.lTrigger * 255;
-			RightTrigger = GamepadState.rTrigger * 255;
+      LeftStick.X  = (int)(GamepadState.stickLX  * 32767.0f);
+      LeftStick.Y  = (int)(GamepadState.stickLY  * 32767.0f);
+      RightStick.X = (int)(GamepadState.stickRX  * 32767.0f);
+      RightStick.Y = (int)(GamepadState.stickRY  * 32767.0f);
+      LeftTrigger  = GamepadState.lTrigger * 255.0f;
+      RightTrigger = GamepadState.rTrigger * 255.0f;
 		}
 	}
 }

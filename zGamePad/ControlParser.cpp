@@ -138,6 +138,20 @@ namespace GOTHIC_ENGINE {
 
 
 
+  static string CurrentControlsNamespace = "";
+  static uint   CurrentCimbinationLine   = 0;
+  static uint   CurrentControlsLine      = 0;
+
+  void zCXInputDevice::ParseControlsId( zTCombination& combination, string row ) {
+    string id = row.GetWordSmart( 2 );
+    combination.Id = string::Combine( "%s.%s", CurrentControlsNamespace, id );
+    for( uint i = 0; i < KeyCombinations.GetNum(); i++ )
+      if( combination.Id == KeyCombinations[i].Id )
+        Message::Fatal( string::Combine( "Key '%s' already defined in '%s' file.", id, CurrentControlsNamespace ));
+  }
+
+
+
   void zCXInputDevice::ParseControlsCombination( zTCombination& combination, string row ) {
     for( uint i = 2; true; i++ ) {
       string token = row.GetWordSmart( i );
@@ -179,6 +193,10 @@ namespace GOTHIC_ENGINE {
 
 
   void zCXInputDevice::ParseControlsEndRecord( zTCombination& combination ) {
+    if( combination.Id.IsEmpty() )
+      cmd << Col16( CMD_RED | CMD_INT ) << string::Combine( "Found unnamed combination in '%s' file.\nLine:%i", CurrentControlsNamespace, CurrentCimbinationLine ) << Col16() << endl;
+      // Message::Fatal( string::Combine( "Found unnamed combination in '%s' file.\nLine:%i", CurrentControlsNamespace, CurrentCimbinationLine ) );
+
     KeyCombinations.InsertSorted( combination );
   }
 
@@ -296,24 +314,31 @@ namespace GOTHIC_ENGINE {
 
 
 
-  bool zCXInputDevice::ParseControlFile() {
-    // Check external control file
-    if( Opt_ControlsFile.IsEmpty() )
-      Opt_ControlsFile = "Controls.Gamepad";
+  inline string FileNamePart( const string& fileFullName ) {
+    string shortName = fileFullName.GetWord( "\\", -1 );
+    string namePart = shortName.GetWord( "." );
+    return namePart;
+  }
 
+
+
+  bool zCXInputDevice::ParseControlFile( const string& fileName ) {
     bool initialized = false;
     zTCombination combination;
     string currentStringName;
 
     string controlsFile;
-    if( !controlsFile.ReadFromVdf( Opt_ControlsFile, VDF_DEFAULT | VDF_PHYSICALFIRST ) ) {
-      cmd << "Controls not found" << endl;
+    if( !controlsFile.ReadFromVdf( fileName, VDF_DEFAULT | VDF_PHYSICALFIRST ) ) {
+      cmd << "Controls '" << fileName << "' not found" << endl;
       return false;
     }
 
+    CurrentControlsNamespace = FileNamePart( fileName );
     rowString controlsRows = controlsFile;
 
     for( uint i = 0; i < controlsRows.GetNum(); i++ ) {
+      CurrentControlsLine = i;
+
       // Skip empty line
       string& row = controlsRows[i];
       if( row.Shrink().IsEmpty() )
@@ -331,6 +356,7 @@ namespace GOTHIC_ENGINE {
         if( initialized ) {
           ParseControlsEndRecord( combination );
           combination.Clear();
+          CurrentCimbinationLine = i;
         }
 
         // One press - one click ??
@@ -341,9 +367,34 @@ namespace GOTHIC_ENGINE {
         initialized = true;
         continue;
       }
+      else if( command == "KeyDisable" ) {
+        if( initialized ) {
+          ParseControlsEndRecord( combination );
+          combination.Clear();
+          // initialized = false;
+        }
+
+        string keyPart1 = row.GetWordSmart( 2, true );
+        string keyPart2 = row.GetWordSmart( 4, true );
+        string keyName;
+        if( keyPart2.IsEmpty() )
+          keyName = string::Combine( "%s.%s", CurrentControlsNamespace, keyPart1 );
+        else
+          keyName = string::Combine( "%s.%s", keyPart1, keyPart2 );
+
+        // cmd << "want to disable: " << keyName << endl;
+        for( uint i = 0; i < KeyCombinations.GetNum(); i++ ) {
+          if( keyName == KeyCombinations[i].Id ) {
+            KeyCombinations.RemoveAt( i );
+            break;
+          }
+        }
+        continue;
+      }
 
            // Parse commands
-           if( command == "Combination" ) ParseControlsCombination( combination, row );
+           if( command == "Id" )          ParseControlsId         ( combination, row );
+      else if( command == "Combination" ) ParseControlsCombination( combination, row );
       else if( command == "Emulation" )   ParseControlsEmulation  ( combination, row );
       else if( command == "Condition" )   ParseControlsCondition  ( combination, row );
       else if( command == "Help" )        ParseControlsHelp       ( combination, row );
@@ -360,7 +411,7 @@ namespace GOTHIC_ENGINE {
       else if( command == "ControlName" ) continue;
       else
         // unknown command !!!
-        Message::Fatal( "Unknown control command: " + command );
+        Message::Fatal( "Unknown controls command: " + command );
     }
 
     // End last record

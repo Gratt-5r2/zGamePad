@@ -40,6 +40,7 @@ namespace GOTHIC_ENGINE {
 		virtual void SetSelectedMenu( const uint& index );
 		virtual void InsertChild( zCGamepadOverlay* overlay );
 		virtual void RemoveChild( zCGamepadOverlay* overlay );
+		virtual void ChangeColor( const zCOLOR& color );
 		virtual int HandleEvent( int key );
 
 		static zCGamepadQuickMenu* GetInstance();
