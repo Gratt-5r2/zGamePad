@@ -15,7 +15,7 @@
     MemSet(begin, '90', length)
   #/patch
   
-  #patch [Remove limin on fight range locking]
+  #patch [Remove limit on fight range locking]
     FLOAT @0x0083D858 = 99999999.0
   #/patch
   
@@ -23,4 +23,10 @@
     //MemSet(0x00750B1B, '90', 0x00750B25 - 0x00750B1B)
     //MemSet(0x0075161C, '90', 0x00751634 - 0x0075161C)
   #/patch
+#/engine
+
+#engine [G1]
+    #patch [Enable Gothic 2 controls]
+        BOOL @Overrides_SP:PARAMETERS:Gothic2_Control = True
+    #/patch
 #/engine

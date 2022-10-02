@@ -17,6 +17,8 @@ namespace GOTHIC_ENGINE {
   zSTRING Opt_UseItemError         = "You should be on the ground.";
   bool Opt_NoDxMode                = false;
   int Opt_QuickSaveMode            = 0;
+  int Opt_Vibration                = 1;
+  int Opt_InvertY                  = 0;
 
   void ApplyGamepadOptions();
 }

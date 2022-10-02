@@ -356,6 +356,17 @@ namespace GOTHIC_ENGINE {
 
 
   void zCXInputDevice::UpdateVibration() {
+    if( !Opt_Vibration ) {
+      if( VibrationMessage.Index != Invalid ) {
+        VibrationMessage.Index = Invalid;
+        Vibration.wLeftMotorSpeed = 0;
+        Vibration.wRightMotorSpeed = 0;
+        XINPUTSETSTATE( 0, &Vibration );
+      }
+      
+      return;
+    }
+
     if( VibrationMessage.Index == Invalid )
       return;
 
@@ -485,16 +496,15 @@ namespace GOTHIC_ENGINE {
 
     // Dive inverse
     int leftStick, rightStick;
+    int invY = Opt_InvertY ? -1 : 1;
 
-    if (!DeviceConnected)
-    {
-        leftStick = (diveMode ? DS4Device.GetLeftStick().X : DS4Device.GetRightStick().X);
-        rightStick = (diveMode ? DS4Device.GetLeftStick().Y : DS4Device.GetRightStick().Y);
+    if( !DeviceConnected ) {
+      leftStick  = (diveMode ? DS4Device.GetLeftStick().X : DS4Device.GetRightStick().X);
+      rightStick = (diveMode ? DS4Device.GetLeftStick().Y : DS4Device.GetRightStick().Y * invY);
     }
-    else
-    {
-        leftStick = (diveMode ? Gamepad.Gamepad.sThumbLX : Gamepad.Gamepad.sThumbRX);
-        rightStick = (diveMode ? Gamepad.Gamepad.sThumbLY : Gamepad.Gamepad.sThumbRY);
+    else {
+      leftStick  = (diveMode ? Gamepad.Gamepad.sThumbLX : Gamepad.Gamepad.sThumbRX);
+      rightStick = (diveMode ? Gamepad.Gamepad.sThumbLY : Gamepad.Gamepad.sThumbRY * invY);
     }
 
     RightStick.X = abs( leftStick  ) > DEADZONE_R ? leftStick  : 0;

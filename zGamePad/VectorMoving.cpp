@@ -176,13 +176,15 @@ namespace GOTHIC_ENGINE {
     return angle * angleSign;
   }
 
-  static float GetRotationBodyAngle( bool useStrafeDeadZone ) {
+  static float GetRotationBodyAngle( bool useStrafeDeadZone, bool leftStick = true ) {
     if( Opt_MotionType == 0 )
       return 0.0f;
 
     zTStickState left, right;
     XInputDevice.GetStickStatesSquare( left, right );
-    zVEC2 direction = zVEC2( (float)left.X, (float)left.Y ).Normalize();
+    zVEC2 direction = leftStick ?
+      zVEC2( (float)left.X, (float)left.Y ).Normalize() :
+      zVEC2( (float)right.X, (float)right.Y ).Normalize();
 
     float angleRad = direction.GetAngle();
     if( angleRad > RAD180 )
