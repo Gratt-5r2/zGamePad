@@ -174,6 +174,7 @@ namespace GOTHIC_ENGINE {
     XINPUT_STATE Gamepad;
     PXINPUT_CAPABILITIES Capabilities;
     XINPUT_VIBRATION Vibration;
+    static bool VibrationIsEnabled;
 
     void InitDevice();
     void UpdateControls();

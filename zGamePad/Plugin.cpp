@@ -34,10 +34,14 @@ namespace GOTHIC_ENGINE {
   static int s_bUseOldControls_Real = 0;
 
   void Game_Loop() {
+    if( keybuffer.GetNum() ) {
+      bool isGpInput = XInputDevice.HasGamepadInput();
+      zCXInputDevice::VibrationIsEnabled = isGpInput;
 #if ENGINE >= Engine_G2
-    if( !s_bUseOldControls_Real && keybuffer.GetNum() )
-      oCGame::s_bUseOldControls = XInputDevice.HasGamepadInput();
+      if( !s_bUseOldControls_Real )
+        oCGame::s_bUseOldControls = isGpInput;
 #endif
+    }
 
     FocusNpcLoop();
     OverlaysLoop();

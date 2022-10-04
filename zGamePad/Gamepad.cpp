@@ -356,7 +356,7 @@ namespace GOTHIC_ENGINE {
 
 
   void zCXInputDevice::UpdateVibration() {
-    if( !Opt_Vibration ) {
+    if( !Opt_Vibration || !VibrationIsEnabled ) {
       if( VibrationMessage.Index != Invalid ) {
         VibrationMessage.Index = Invalid;
         Vibration.wLeftMotorSpeed = 0;
